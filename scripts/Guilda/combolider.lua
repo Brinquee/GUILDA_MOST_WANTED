@@ -48,7 +48,7 @@ MultiLeaderTextEdit < Panel
     text-align: center
 
 MultiLeaderWindow < MainWindow
-  text: Multi Leader Attack by Soule
+  text: Multi Leader Attack by Souleee
   size: 400 350
   padding: 25
 
