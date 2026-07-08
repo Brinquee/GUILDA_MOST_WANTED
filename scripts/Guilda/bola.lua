@@ -1,3 +1,5 @@
+setDefaultTab("GUILD")
+
 
 -- Definir o estilo PushMaxWindow primeiro
 g_ui.loadUIFromString([[
