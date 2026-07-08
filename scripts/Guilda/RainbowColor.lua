@@ -1,3 +1,5 @@
+setDefaultTab("GUILD")
+
 macro(500, "Rainbow Uma Cor", function()
     local currentOutfit = player:getOutfit()
     
