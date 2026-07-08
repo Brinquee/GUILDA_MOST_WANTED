@@ -1,3 +1,5 @@
+setDefaultTab("GUILD")
+
 UI.Label("PVP"):setColor("#00BFFF")
 UI.Separator()
 UI.Label("Multi-Lider Targeta"):setColor("#FFFFFF")
