@@ -23,8 +23,13 @@ script_manager = {
     _cache = {
         Guilda = {
             ['Pot Guild'] = {
-                url = 'https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/Dwo84.lua',
+                url = 'https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/PotGuild.lua',
                 description = 'Macro de auto potion allies e party pot.',
+                author = 'Brinquee', enabled = false
+            },
+            ['Combo Lider'] = {
+                url = 'https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/combolider.lua',
+                description = 'Macro de combo lider para a guilda.',
                 author = 'Brinquee', enabled = false
             },
         },
