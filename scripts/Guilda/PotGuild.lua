@@ -1,3 +1,5 @@
+setDefaultTab("GUILD")
+
 --[[
 ===================================================
 PartyPot - Party Manager + Auto Potion Allies   
