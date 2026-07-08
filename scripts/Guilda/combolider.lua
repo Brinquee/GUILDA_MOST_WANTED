@@ -1,4 +1,4 @@
-setDefaultTab("GUILD")
+setDefaultTab("HOME")
 
 UI.Label("PVP"):setColor("#00BFFF")
 UI.Separator()
