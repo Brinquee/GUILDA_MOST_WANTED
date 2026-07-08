@@ -40,7 +40,7 @@ Panel
 
   Label
     id: skillHeaderBase
-    text: --- STAssaTUS ---
+    text: --- STATUS ---
     color: #FFFFFF
     font: verdana-11px-rounded
     anchors.top: prev.bottom
