@@ -9,34 +9,34 @@ local tempoDeEspera = 1000
 -- Lista de Links Diretos
 local meusLinksDeMacros = {
     -- [SLOT 1]
-    "https://githubusercontent.com",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/ANTIPUSH.lua",
     
     -- [SLOT 2]
-    "https://githubusercontent.com",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Configs_extras.lua",
     
     -- [SLOT 3]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/PotGuild.lua",
     
     -- [SLOT 4]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Filtro_batle.lua",
     
     -- [SLOT 5]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/RainbowColor.lua",
     
     -- [SLOT 6]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Skills.lua",
     
     -- [SLOT 7]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/bola.lua",
     
     -- [SLOT 8]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/combolider.lua",
     
     -- [SLOT 9]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/enegy_ssa.lua",
     
     -- [SLOT 10]
-    "",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/stamin.lua",
 }
 
 -- Função interna que gerencia o download de um único arquivo por vez
