@@ -1,4 +1,4 @@
-setDefaultTab("PVP")
+setDefaultTab("GUILD")
 
   local function botPrintMessage(message)
     modules.game_textmessage.displayGameMessage(message)
