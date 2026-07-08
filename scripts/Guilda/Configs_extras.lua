@@ -1,3 +1,5 @@
+setDefaultTab("GUILD")
+
 local warPanelName = "warVisualConfigFinal" -- Reset completo para aplicar a lógica real
 
 -- Inicializa o armazenamento com os alinhamentos corretos de cada escudo
