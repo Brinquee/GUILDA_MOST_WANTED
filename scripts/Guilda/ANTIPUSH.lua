@@ -1,4 +1,4 @@
-setDefaultTab("GUILD")
+setDefaultTab("HOME")
 
   local function botPrintMessage(message)
     modules.game_textmessage.displayGameMessage(message)
