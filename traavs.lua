@@ -22,6 +22,11 @@ script_manager = {
     actualVersion = 0.4,
     _cache = {
         Guilda = {
+            ['teste'] = {
+                url = 'https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/Dwo84.lua',
+                description = 'Macro de auto potion allies e party pot.',
+                author = 'Brinquee', enabled = false
+            },
             ['Pot Guild'] = {
                 url = 'https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/PotGuild.lua',
                 description = 'Macro de auto potion allies e party pot.',
