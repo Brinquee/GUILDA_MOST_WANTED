@@ -94,7 +94,7 @@ MultiLeaderWindow < MainWindow
         
       CheckBox
         id: amigoElfBox
-        text: Amigo Elf
+        text: 
         margin-bottom: 5
 
     Panel
@@ -266,7 +266,7 @@ macro(1000, "Attack multi-leader's target", function()
 end)
 
 -- MACRO ADICIONADO: Falar Nome do Alvo (SÓ FUNCIONA COM A CAIXINHA "AMIGO ELF" MARCADA)
-macro(2000, "Falar Nome do Alvo", function()
+macro(2000, "Falar Nome do Alvoooooo", function()
     if not settings.enabled or not settings.amigoElf then return end
     
     local target = g_game.getAttackingCreature()
