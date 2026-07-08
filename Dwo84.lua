@@ -1,14 +1,14 @@
 -- ===================================================
--- ARQUIVO DO GITHUB: MULTI-ATUALIZADOR VIA MACRO-DELAY
+-- ARQUIVO DO GITHUB: MULTI-ATUALIZADOR COM CONTROLE DE DELAY
 -- ===================================================
 
 -- DEFINA O DELAY AQUI (em milissegundos)
 -- 1000 = 1 segundo de espera entre o download de cada macro
 local tempoDeEspera = 1000 
 
--- Lista de Links Diretos
+-- Lista de Links Diretos (Insira os links brutos do seu GitHub aqui nas aspas)
 local meusLinksDeMacros = {
-    -- [SLOT 1]
+  -- [SLOT 1]
     "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/ANTIPUSH.lua",
     
     -- [SLOT 2]
@@ -39,69 +39,75 @@ local meusLinksDeMacros = {
     "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/stamin.lua",
 }
 
-local indiceAtual = 1
-local baixandoFila = false
-
--- Macro nativo estável do vBot para processar o delay sem dar 'nil value'
-local motorCronometro = macro(tempoDeEspera, "Motor Fila", function()
-    -- Se não houver ordem de download ou a lista chegou ao fim, desliga o relógio
-    if not baixandoFila or indiceAtual > #meusLinksDeMacros then
-        baixandoFila = false
-        return
-    end
-
-    local linkRaw = meusLinksDeMacros[indiceAtual]
+-- Função interna que gerencia o download de um único arquivo por vez
+local function baixarMacroEspecifico(indice)
+    local linkRaw = meusLinksDeMacros[indice]
     
-    -- Se o slot estiver vazio, avança para o próximo na próxima volta do relógio
+    -- Se o link estiver vazio, pula para o próximo da lista imediatamente
     if not linkRaw or linkRaw == "" then
-        indiceAtual = indiceAtual + 1
+        local proximoIndice = indice + 1
+        if meusLinksDeMacros[proximoIndice] then
+            baixarMacroEspecifico(proximoIndice)
+        else
+            print("[Updater] Todos os slots checados")
+        end
         return
     end
 
-    -- Trava a execução para não atropelar o HTTP
-    baixandoFila = false
-
+    -- Adiciona o anti-cache no final do link completo
     local urlComAntiCache = linkRaw .. "?v=" .. os.time()
-    print("[Updater] [" .. indiceAtual .. "/10] Conectando para baixar slot " .. indiceAtual)
-
+    
+    print("[Updater] [" .. indice .. "/10] Conectando para baixar slot " .. indice)
+    
     HTTP.get(urlComAntiCache, function(dados, erro)
         if erro then
-            print("[Updater] Erro no slot " .. indiceAtual .. ": " .. tostring(erro))
+            print("[Updater] Erro no slot " .. indice .. ": " .. tostring(erro))
         else
+            -- Limpeza da interface gráfica se for o PotGuild
             if linkRaw:find("PotGuild.lua") then
                 if partyPotUI then partyPotUI:destroy() partyPotUI = nil end
                 if ppWindow then ppWindow:destroy() ppWindow = nil end
             end
             
-            local scriptExecutavel = loadstring(dados)
-            if scriptExecutavel then
+            -- Compila o texto bruto baixado do GitHub em código executável
+            local scriptExecutavel, erroCompilacao = loadstring(dados)
+            if not scriptExecutavel then
+                print("[Updater] Erro de sintaxe no slot " .. indice .. ": " .. tostring(erroCompilacao))
+            else
+                -- Injeta o script na memória RAM ativa do vBot
                 local sucesso, erroExecucao = pcall(scriptExecutavel)
                 if sucesso then
-                    print("[Updater] Slot " .. indiceAtual .. " injetado com sucesso")
+                    print("[Updater] Slot " .. indice .. " injetado com sucesso")
                 else
-                    print("[Updater] Erro ao rodar slot " .. indiceAtual .. ": " .. tostring(erroExecucao))
+                    print("[Updater] Erro ao rodar macro do slot " .. indice .. ": " .. tostring(erroExecucao))
                 end
             end
         end
 
-        -- Avança o índice e religa o cronômetro para o próximo macro
-        indiceAtual = indiceAtual + 1
-        baixandoFila = true
+        -- CORREÇÃO DA FILA: Trocado scheduleEvent por schedule nativo do vBot
+        local proximoIndice = indice + 1
+        if meusLinksDeMacros[proximoIndice] then
+            schedule(tempoDeEspera, function()
+                baixarMacroEspecifico(proximoIndice)
+            end)
+        else
+            schedule(tempoDeEspera, function()
+                print("[Updater] Atualizacao em lote encerrada perfeitamente")
+            end)
+        end
     end)
-end)
-
--- Garante que o motor comece desligado em segundo plano
-motorCronometro:setOff()
-
-local function iniciarFilaDeDownload()
-    print("[Updater] Iniciando download cronometrado dos macros ativos")
-    indiceAtual = 1
-    baixandoFila = true
-    motorCronometro:setOn()
 end
 
+-- Função disparada pelo botão ou no arranque do bot
+local function iniciarFilaDeDownload()
+    print("[Updater] Iniciando download cronometrado dos macros ativos")
+    baixarMacroEspecifico(1)
+end
+
+-- Cria o botão unificado na interface lateral do vBot (sem emojis)
 UI.Button("Atualizar Meus Macros", function()
     iniciarFilaDeDownload()
 end)
 
+-- Executa automaticamente assim que o bot abre para começar atualizado
 iniciarFilaDeDownload()
