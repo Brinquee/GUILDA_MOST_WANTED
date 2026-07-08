@@ -1,14 +1,14 @@
 -- ===================================================
--- SCRIPT LOCAL: MULTI-ATUALIZADOR COM CONTROLE DE DELAY
+-- ARQUIVO DO GITHUB: MULTI-ATUALIZADOR COM CONTROLE DE DELAY
 -- ===================================================
 
 -- DEFINA O DELAY AQUI (em milissegundos)
 -- 1000 = 1 segundo de espera entre o download de cada macro
 local tempoDeEspera = 1000 
 
--- Lista de Links Diretos
+-- Lista de Links Diretos (Insira os links brutos do seu GitHub aqui nas aspas)
 local meusLinksDeMacros = {
-    -- [SLOT 1]
+   -- [SLOT 1]
     "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/ANTIPUSH.lua",
     
     -- [SLOT 2]
@@ -84,16 +84,16 @@ local function baixarMacroEspecifico(indice)
             end
         end
 
-        -- SISTEMA DE FILA COM DELAY CONTROLADO
+        -- CORREÇÃO DA FILA: Trocado scheduleEvent por schedule nativo do vBot
         local proximoIndice = indice + 1
         if meusLinksDeMacros[proximoIndice] then
-            scheduleEvent(function()
+            schedule(tempoDeEspera, function()
                 baixarMacroEspecifico(proximoIndice)
-            end, tempoDeEspera)
+            end)
         else
-            scheduleEvent(function()
+            schedule(tempoDeEspera, function()
                 print("[Updater] Atualizacao em lote encerrada perfeitamente")
-            end, tempoDeEspera)
+            end)
         end
     end)
 end
