@@ -6,7 +6,7 @@
 -- 1000 = 1 segundo de espera entre o download de cada macro
 local tempoDeEspera = 1000 
 
--- Lista de Links Diretos (Insira os links brutos do seu GitHub aqui nas aspas)
+-- Lista de Links Diretos (Pode aumentar as linhas o quanto quiser, o script aceita!)
 local meusLinksDeMacros = {
   -- [SLOT 1]
     "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/ANTIPUSH.lua",
@@ -57,7 +57,8 @@ local function baixarMacroEspecifico(indice)
     -- Adiciona o anti-cache no final do link completo
     local urlComAntiCache = linkRaw .. "?v=" .. os.time()
     
-    print("[Updater] [" .. indice .. "/10] Conectando para baixar slot " .. indice)
+    -- MODIFICAÇÃO INSERIDA: O script agora calcula sozinho o limite máximo de slots da lista usando #meusLinksDeMacros
+    print("[Updater] [" .. indice .. "/" .. #meusLinksDeMacros .. "] Conectando para baixar slot " .. indice)
     
     HTTP.get(urlComAntiCache, function(dados, erro)
         if erro then
@@ -84,7 +85,7 @@ local function baixarMacroEspecifico(indice)
             end
         end
 
-        -- CORREÇÃO DA FILA: Trocado scheduleEvent por schedule nativo do vBot
+        -- SISTEMA DE FILA COM DELAY CONTROLADO VIA SCHEDULE NATIVO DO VBOT
         local proximoIndice = indice + 1
         if meusLinksDeMacros[proximoIndice] then
             schedule(tempoDeEspera, function()
