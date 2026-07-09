@@ -42,7 +42,13 @@ local meusLinksDeMacros = {
     "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/healingpro.lua",  
   
     -- [SLOT 12]
-    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exiva.lua",
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exiva.lua",  
+  
+    -- [SLOT 13]
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Magiasempk.lua",  
+  
+    -- [SLOT 14]
+    "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/FPS.lua",
 }
 
 -- Função interna que gerencia o download de um único arquivo por vez
