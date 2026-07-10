@@ -1,4 +1,3 @@
-
 ------------------------------------------------------
 local secondsToIdle = 5
 local activeFPS = 60
@@ -24,7 +23,9 @@ local lastMousePos = nil
 local finalMousePos = nil
 local idleCount = 0
 local maxIdle = secondsToIdle * 4
-macro(250, "Idle Mode", function()
+
+-- Salva o macro em uma variável para podermos monitorar quando ele é desligado
+local idleMacro = macro(250, "Idle Mode", function()
   local currentMousePos = g_window.getMousePosition()
 
   if finalMousePos then
@@ -46,3 +47,12 @@ macro(250, "Idle Mode", function()
     idleCount = 0
   end
 end)
+
+-- FUNÇÃO DE SEGURANÇA: Se você desligar o botão do macro, a tela acende automaticamente
+idleMacro.onOff = function(macroRef, enabled)
+  if not enabled then
+    setActive()
+    finalMousePos = nil
+    idleCount = 0
+  end
+end
