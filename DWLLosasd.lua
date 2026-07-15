@@ -1,5 +1,5 @@
 -- ==========================================================
--- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (VERSÃO FINAL FIXADA)
+-- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (CORRIGIDO PARA SEM ACENTO)
 -- ==========================================================
 
 local MAPA_MACROS_GUILDA = {
@@ -25,20 +25,30 @@ if type(storage[panelNameStorage].macrosMarcados) ~= "table" then
     storage[panelNameStorage].macrosMarcados = {}
     for _, item in ipairs(MAPA_MACROS_GUILDA) do storage[panelNameStorage].macrosMarcados[item.key] = true end
 end
+
 local function injetarPainelDeEscolhasNaJanela()
     local root = g_ui.getRootWidget()
     local janelaMestra = nil
     for _, child in pairs(root:getChildren()) do
-        if child:getText() == "Status da Licenca - Most Wanted" then janelaMestra = child break end
+        -- FIXADO: Agora buscando rigorosamente sem acento idêntico ao seu print
+        if child:getText() == "Status da Licenca - Most Wanted" then 
+            janelaMestra = child 
+            break 
+        end
     end
 
-    if not janelaMestra then return end
+    if not janelaMestra then 
+        print(">>> [DEBUG] Janela Mestra nao foi encontrada na raiz visual do client.")
+        return 
+    end
     
+    -- Alarga a janela para abrir espaço pro painel de caixas na direita
     janelaMestra:setSize({width = 540, height = 420})
 
     if janelaMestra.painelListaMacros then janelaMestra.painelListaMacros:destroy() end
     if janelaMestra.btnDispararBaixador then janelaMestra.btnDispararBaixador:destroy() end
 
+    -- Painel de rolagem direito para os 15 CheckBoxes
     local painelListaMacros = g_ui.createWidget("ScrollablePanel", janelaMestra)
     painelListaMacros:setId("painelListaMacros")
     painelListaMacros:setSize({width = 240, height = 300})
@@ -51,7 +61,6 @@ local function injetarPainelDeEscolhasNaJanela()
     layoutVertical:setSpacing(5)
     painelListaMacros:setLayout(layoutVertical)
 
-    -- LOOP 100% CORRIGIDO DE ACORDO COM AS REGRAS DO SEU CLIENT
     for k, macroObj in ipairs(MAPA_MACROS_GUILDA) do
         local caixaLinha = g_ui.createWidget("CheckBox", painelListaMacros)
         caixaLinha:setText(macroObj.nome)
@@ -68,6 +77,7 @@ local function injetarPainelDeEscolhasNaJanela()
         end
     end
 
+    -- Botão verde inferior direito para injeção manual
     local btnDispararBaixador = g_ui.createWidget("Button", janelaMestra)
     btnDispararBaixador:setId("btnDispararBaixador")
     btnDispararBaixador:setText("Injetar Scripts Selecionados")
@@ -84,6 +94,7 @@ local function injetarPainelDeEscolhasNaJanela()
         executarFilaCustomizadaHTTP(1)
     end
 end
+
 function executarFilaCustomizadaHTTP(indice)
     local macroAlvo = MAPA_MACROS_GUILDA[indice]
     if not macroAlvo then
@@ -107,7 +118,6 @@ function executarFilaCustomizadaHTTP(indice)
                 local compilar, syntaxErr = loadstring(content)
                 if compilar then pcall(compilar) else print("[Baixador] Erro no slot " .. macroAlvo.nome .. ": " .. tostring(syntaxErr)) end
             end
-
             schedule(1000, function() executarFilaCustomizadaHTTP(indice + 1) end)
         end)
     else
@@ -115,6 +125,6 @@ function executarFilaCustomizadaHTTP(indice)
     end
 end
 
--- DISPARO DA INTERFACE
+-- Ativação nativa da interface expandida
 injetarPainelDeEscolhasNaJanela()
 executarFilaCustomizadaHTTP(1)
