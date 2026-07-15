@@ -1,5 +1,5 @@
 -- ==========================================================
--- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (VERSÃO COM PAINEL)
+-- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (VERSÃO COM PAINEL CORRIGIDA)
 -- ==========================================================
 
 -- Lista oficial dos seus 15 slots com nomes humanos e links RAW
@@ -40,7 +40,7 @@ local function injetarPainelDeEscolhasNaJanela()
     if not janelaMestra then return end
     
     -- Ajusta o tamanho da janela para caber o menu de escolhas sem cortar informações
-    janelaMestra:setSize({width = 520, height = 400})
+    janelaMestra:setSize({width = 540, height = 420})
 
     -- Se o painel de rolagem já existir ali dentro, destrói para recarregar limpo
     if janelaMestra.painelListaMacros then janelaMestra.painelListaMacros:destroy() end
@@ -49,7 +49,7 @@ local function injetarPainelDeEscolhasNaJanela()
     -- 1. Cria a caixa de rolagem no lado direito (Isola os macros do texto de segurança)
     local painelListaMacros = g_ui.createWidget("ScrollablePanel", janelaMestra)
     painelListaMacros:setId("painelListaMacros")
-    painelListaMacros:setSize({width = 240, height = 280})
+    painelListaMacros:setSize({width = 240, height = 300})
     painelListaMacros:addAnchor(AnchorTop, "parent", AnchorTop)
     painelListaMacros:addAnchor(AnchorRight, "parent", AnchorRight)
     painelListaMacros:setMarginTop(35)
@@ -59,8 +59,8 @@ local function injetarPainelDeEscolhasNaJanela()
     layoutVertical:setSpacing(5)
     painelListaMacros:setLayout(layoutVertical)
 
-    -- 2. Cria as 15 caixas de marcação (CheckBox) de forma automatizada
-    for _, macroObj do
+    -- 2. CORREÇÃO DA LINHA 63: Adicionado o loop legítimo do Lua para ler a tabela
+    for _, macroObj in ipairs(MAPA_MACROS_GUILDA) do
         local caixaLinha = g_ui.createWidget("CheckBox", painelListaMacros)
         caixaLinha:setText(macroObj.nome)
         caixaLinha:setFont("verdana-11px-rounded")
@@ -131,5 +131,5 @@ function executarFilaCustomizadaHTTP(indice)
 end
 
 -- PONTO DE DISPARO AUTOMÁTICO: Injeta as CheckBoxes na tela e baixa tudo ao logar se a licença estiver ativa
-injectedPainelDeEscolhasNaJanela()
+injetarPainelDeEscolhasNaJanela()
 executarFilaCustomizadaHTTP(1)
