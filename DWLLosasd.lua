@@ -132,8 +132,8 @@ function executarFilaCustomizadaHTTP(indice)
     end
 end
 
--- EXPORTAÇÃO GLOBAL DA COORDENADA: Liga o clique do botão local ao painel remoto
-_G.abrirJanelaDeMacrosGlobal = function()
+-- EXPORTAÇÃO COMPATÍVEL: Associa a função de clique dentro da tabela global de módulos do client
+modules.abrirJanelaDeMacrosGlobal = function()
     if painelMacrosIndependenteUI then
         if painelMacrosIndependenteUI:isVisible() then
             painelMacrosIndependenteUI:hide()
@@ -147,3 +147,4 @@ end
 
 construirPainelDeMacrosProprio()
 executarFilaCustomizadaHTTP(1)
+
