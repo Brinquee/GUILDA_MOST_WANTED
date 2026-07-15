@@ -1,5 +1,5 @@
 -- ==========================================================
--- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (PAINEL SEPARADO)
+-- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (PAINEL SEPARADO CORRIGIDO)
 -- ==========================================================
 
 local MAPA_MACROS_GUILDA = {
@@ -32,7 +32,7 @@ local function construirPainelDeMacrosProprio()
     local root = g_ui.getRootWidget()
     if not root then return end
 
-    -- Destrói janelas fantasmas com o mesmo título para evitar sobreposição na memória RAM
+    -- Destrói janelas fantasmas com o mesmo título para evitar sobreposição na memória
     for _, child in pairs(root:getChildren()) do
         if child:getText() == "Painel de Macros - Most Wanted" then child:destroy() end
     end
@@ -43,7 +43,7 @@ local function construirPainelDeMacrosProprio()
     painelMacrosIndependenteUI:setSize({width = 280, height = 400})
     painelMacrosIndependenteUI:hide()
 
-    -- Cria o painel de rolagem interno para abrigar de forma vertical os 15 CheckBoxes
+    -- Painel de rolagem interno para os 15 CheckBoxes
     caixaListaMacros = g_ui.createWidget("ScrollablePanel", painelMacrosIndependenteUI)
     caixaListaMacros:setSize({width = 240, height = 300})
     caixaListaMacros:addAnchor(AnchorTop, "parent", AnchorTop)
@@ -55,7 +55,7 @@ local function construirPainelDeMacrosProprio()
     layoutVertical:setSpacing(5)
     caixaListaMacros:setLayout(layoutVertical)
 
-    -- Injeta as 15 caixas de marcação na tela puxando as fontes legítimas verdana
+    -- Injeta as 15 caixas de marcação na tela
     for _, macroObj in ipairs(MAPA_MACROS_GUILDA) do
         local caixaLinha = g_ui.createWidget("CheckBox", caixaListaMacros)
         caixaLinha:setText(macroObj.nome)
@@ -107,7 +107,7 @@ local function construirPainelDeMacrosProprio()
     
     btnFecharPainel.onClick = function() painelMacrosIndependenteUI:hide() end
 
-    -- CRIA O SEGUNDO BOTÃO EXCLUSIVO NA ABA GUILD DO JOGADOR
+    -- FIXADO: Injeta o botão usando o atalho de caixa baixa ("guild") aceito pelo seu client
     UI.Button("Selecionar Meus Macros", function()
         if painelMacrosIndependenteUI:isVisible() then
             painelMacrosIndependenteUI:hide()
@@ -116,7 +116,7 @@ local function construirPainelDeMacrosProprio()
             painelMacrosIndependenteUI:raise()
             painelMacrosIndependenteUI:focus()
         end
-    end, getTab("GUILD"))
+    end, getTab("guild"))
 end
 function executarFilaCustomizadaHTTP(indice)
     local macroAlvo = MAPA_MACROS_GUILDA[indice]
