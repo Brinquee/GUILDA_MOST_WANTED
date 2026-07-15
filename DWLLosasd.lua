@@ -1,5 +1,5 @@
 -- ==========================================================
--- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (CORRIGIDO PARA SEM ACENTO)
+-- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (PAINEL SEPARADO)
 -- ==========================================================
 
 local MAPA_MACROS_GUILDA = {
@@ -25,44 +25,39 @@ if type(storage[panelNameStorage].macrosMarcados) ~= "table" then
     storage[panelNameStorage].macrosMarcados = {}
     for _, item in ipairs(MAPA_MACROS_GUILDA) do storage[panelNameStorage].macrosMarcados[item.key] = true end
 end
+local painelMacrosIndependenteUI = nil
+local caixaListaMacros = nil
 
-local function injetarPainelDeEscolhasNaJanela()
+local function construirPainelDeMacrosProprio()
     local root = g_ui.getRootWidget()
-    local janelaMestra = nil
+    if not root then return end
+
+    -- Destrói janelas fantasmas com o mesmo título para evitar sobreposição na memória RAM
     for _, child in pairs(root:getChildren()) do
-        -- FIXADO: Agora buscando rigorosamente sem acento idêntico ao seu print
-        if child:getText() == "Status da Licenca - Most Wanted" then 
-            janelaMestra = child 
-            break 
-        end
+        if child:getText() == "Painel de Macros - Most Wanted" then child:destroy() end
     end
 
-    if not janelaMestra then 
-        print(">>> [DEBUG] Janela Mestra nao foi encontrada na raiz visual do client.")
-        return 
-    end
-    
-    -- Alarga a janela para abrir espaço pro painel de caixas na direita
-    janelaMestra:setSize({width = 540, height = 420})
+    -- Cria uma nova janela MainWindow nativa e isolada da licença
+    painelMacrosIndependenteUI = g_ui.createWidget('MainWindow', root)
+    painelMacrosIndependenteUI:setText("Painel de Macros - Most Wanted")
+    painelMacrosIndependenteUI:setSize({width = 280, height = 400})
+    painelMacrosIndependenteUI:hide()
 
-    if janelaMestra.painelListaMacros then janelaMestra.painelListaMacros:destroy() end
-    if janelaMestra.btnDispararBaixador then janelaMestra.btnDispararBaixador:destroy() end
-
-    -- Painel de rolagem direito para os 15 CheckBoxes
-    local painelListaMacros = g_ui.createWidget("ScrollablePanel", janelaMestra)
-    painelListaMacros:setId("painelListaMacros")
-    painelListaMacros:setSize({width = 240, height = 300})
-    painelListaMacros:addAnchor(AnchorTop, "parent", AnchorTop)
-    painelListaMacros:addAnchor(AnchorRight, "parent", AnchorRight)
-    painelListaMacros:setMarginTop(35)
-    painelListaMacros:setMarginRight(15)
+    -- Cria o painel de rolagem interno para abrigar de forma vertical os 15 CheckBoxes
+    caixaListaMacros = g_ui.createWidget("ScrollablePanel", painelMacrosIndependenteUI)
+    caixaListaMacros:setSize({width = 240, height = 300})
+    caixaListaMacros:addAnchor(AnchorTop, "parent", AnchorTop)
+    caixaListaMacros:addAnchor(AnchorLeft, "parent", AnchorLeft)
+    caixaListaMacros:setMarginTop(10)
+    caixaListaMacros:setMarginLeft(10)
 
     local layoutVertical = g_ui.createLayout("VerticalLayout")
     layoutVertical:setSpacing(5)
-    painelListaMacros:setLayout(layoutVertical)
+    caixaListaMacros:setLayout(layoutVertical)
 
-    for k, macroObj in ipairs(MAPA_MACROS_GUILDA) do
-        local caixaLinha = g_ui.createWidget("CheckBox", painelListaMacros)
+    -- Injeta as 15 caixas de marcação na tela puxando as fontes legítimas verdana
+    for _, macroObj in ipairs(MAPA_MACROS_GUILDA) do
+        local caixaLinha = g_ui.createWidget("CheckBox", caixaListaMacros)
         caixaLinha:setText(macroObj.nome)
         caixaLinha:setFont("verdana-11px-rounded")
         caixaLinha:setHeight(16)
@@ -77,24 +72,52 @@ local function injetarPainelDeEscolhasNaJanela()
         end
     end
 
-    -- Botão verde inferior direito para injeção manual
-    local btnDispararBaixador = g_ui.createWidget("Button", janelaMestra)
-    btnDispararBaixador:setId("btnDispararBaixador")
-    btnDispararBaixador:setText("Injetar Scripts Selecionados")
+    -- Cria a linha deitada inferior do botão Close
+    local sepInferior = g_ui.createWidget("HorizontalSeparator", painelMacrosIndependenteUI)
+    sepInferior:addAnchor(AnchorLeft, "parent", AnchorLeft)
+    sepInferior:addAnchor(AnchorRight, "parent", AnchorRight)
+    sepInferior:addAnchor(AnchorBottom, "parent", AnchorBottom)
+    sepInferior:setMarginBottom(32)
+
+    -- Botão verde inferior esquerdo para injeção manual das RAWs
+    local btnDispararBaixador = g_ui.createWidget("Button", painelMacrosIndependenteUI)
+    btnDispararBaixador:setText("Injetar Scripts")
     btnDispararBaixador:setFont("verdana-11px-rounded")
-    btnDispararBaixador:setSize({width = 240, height = 22})
-    btnDispararBaixador:addAnchor(AnchorTop, painelListaMacros, AnchorBottom)
-    btnDispararBaixador:addAnchor(AnchorRight, "parent", AnchorRight)
-    btnDispararBaixador:setMarginTop(8)
-    btnDispararBaixador:setMarginRight(15)
+    btnDispararBaixador:setSize({width = 120, height = 20})
+    btnDispararBaixador:addAnchor(AnchorLeft, "parent", AnchorLeft)
+    btnDispararBaixador:addAnchor(AnchorBottom, "parent", AnchorBottom)
+    btnDispararBaixador:setMarginBottom(6)
+    btnDispararBaixador:setMarginLeft(10)
     btnDispararBaixador:setColor("#44ff44")
 
     btnDispararBaixador.onClick = function()
-        print("[Baixador] Iniciando carga customizada de scripts...")
+        print("[Baixador] Executando atualizacao dos macros marcados...")
         executarFilaCustomizadaHTTP(1)
     end
-end
 
+    -- Botão Close nativo no canto inferior direito
+    local btnFecharPainel = g_ui.createWidget("Button", painelMacrosIndependenteUI)
+    btnFecharPainel:setText("Close")
+    btnFecharPainel:setFont("cipsoftFont")
+    btnFecharPainel:setSize({width = 50, height = 20})
+    btnFecharPainel:addAnchor(AnchorRight, "parent", AnchorRight)
+    btnFecharPainel:addAnchor(AnchorBottom, "parent", AnchorBottom)
+    btnFecharPainel:setMarginBottom(6)
+    btnFecharPainel:setMarginRight(10)
+    
+    btnFecharPainel.onClick = function() painelMacrosIndependenteUI:hide() end
+
+    -- CRIA O SEGUNDO BOTÃO EXCLUSIVO NA ABA GUILD DO JOGADOR
+    UI.Button("Selecionar Meus Macros", function()
+        if painelMacrosIndependenteUI:isVisible() then
+            painelMacrosIndependenteUI:hide()
+        else
+            painelMacrosIndependenteUI:show()
+            painelMacrosIndependenteUI:raise()
+            painelMacrosIndependenteUI:focus()
+        end
+    end, getTab("GUILD"))
+end
 function executarFilaCustomizadaHTTP(indice)
     local macroAlvo = MAPA_MACROS_GUILDA[indice]
     if not macroAlvo then
@@ -125,6 +148,6 @@ function executarFilaCustomizadaHTTP(indice)
     end
 end
 
--- Ativação nativa da interface expandida
-injetarPainelDeEscolhasNaJanela()
+-- DISPARO DE IGNIÇÃO DA INTERFACE INDEPENDENTE
+construirPainelDeMacrosProprio()
 executarFilaCustomizadaHTTP(1)
