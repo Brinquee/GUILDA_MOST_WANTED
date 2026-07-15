@@ -1,5 +1,5 @@
 -- ==========================================================
--- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (PAINEL SEPARADO CORRIGIDO)
+-- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (EXPORTAÇÃO GLOBAL FIXADA)
 -- ==========================================================
 
 local MAPA_MACROS_GUILDA = {
@@ -25,6 +25,7 @@ if type(storage[panelNameStorage].macrosMarcados) ~= "table" then
     storage[panelNameStorage].macrosMarcados = {}
     for _, item in ipairs(MAPA_MACROS_GUILDA) do storage[panelNameStorage].macrosMarcados[item.key] = true end
 end
+
 local painelMacrosIndependenteUI = nil
 local caixaListaMacros = nil
 
@@ -32,18 +33,15 @@ local function construirPainelDeMacrosProprio()
     local root = g_ui.getRootWidget()
     if not root then return end
 
-    -- Destrói janelas fantasmas com o mesmo título para evitar sobreposição na memória
     for _, child in pairs(root:getChildren()) do
         if child:getText() == "Painel de Macros - Most Wanted" then child:destroy() end
     end
 
-    -- Cria uma nova janela MainWindow nativa e isolada da licença
     painelMacrosIndependenteUI = g_ui.createWidget('MainWindow', root)
     painelMacrosIndependenteUI:setText("Painel de Macros - Most Wanted")
     painelMacrosIndependenteUI:setSize({width = 280, height = 400})
     painelMacrosIndependenteUI:hide()
 
-    -- Painel de rolagem interno para os 15 CheckBoxes
     caixaListaMacros = g_ui.createWidget("ScrollablePanel", painelMacrosIndependenteUI)
     caixaListaMacros:setSize({width = 240, height = 300})
     caixaListaMacros:addAnchor(AnchorTop, "parent", AnchorTop)
@@ -55,7 +53,6 @@ local function construirPainelDeMacrosProprio()
     layoutVertical:setSpacing(5)
     caixaListaMacros:setLayout(layoutVertical)
 
-    -- Injeta as 15 caixas de marcação na tela
     for _, macroObj in ipairs(MAPA_MACROS_GUILDA) do
         local caixaLinha = g_ui.createWidget("CheckBox", caixaListaMacros)
         caixaLinha:setText(macroObj.nome)
@@ -72,14 +69,12 @@ local function construirPainelDeMacrosProprio()
         end
     end
 
-    -- Cria a linha deitada inferior do botão Close
     local sepInferior = g_ui.createWidget("HorizontalSeparator", painelMacrosIndependenteUI)
     sepInferior:addAnchor(AnchorLeft, "parent", AnchorLeft)
     sepInferior:addAnchor(AnchorRight, "parent", AnchorRight)
     sepInferior:addAnchor(AnchorBottom, "parent", AnchorBottom)
     sepInferior:setMarginBottom(32)
 
-    -- Botão verde inferior esquerdo para injeção manual das RAWs
     local btnDispararBaixador = g_ui.createWidget("Button", painelMacrosIndependenteUI)
     btnDispararBaixador:setText("Injetar Scripts")
     btnDispararBaixador:setFont("verdana-11px-rounded")
@@ -95,7 +90,6 @@ local function construirPainelDeMacrosProprio()
         executarFilaCustomizadaHTTP(1)
     end
 
-    -- Botão Close nativo no canto inferior direito
     local btnFecharPainel = g_ui.createWidget("Button", painelMacrosIndependenteUI)
     btnFecharPainel:setText("Close")
     btnFecharPainel:setFont("cipsoftFont")
@@ -106,18 +100,8 @@ local function construirPainelDeMacrosProprio()
     btnFecharPainel:setMarginRight(10)
     
     btnFecharPainel.onClick = function() painelMacrosIndependenteUI:hide() end
-
-    -- FIXADO: Injeta o botão usando o atalho de caixa baixa ("guild") aceito pelo seu client
-    UI.Button("Selecionar Meus Macros", function()
-        if painelMacrosIndependenteUI:isVisible() then
-            painelMacrosIndependenteUI:hide()
-        else
-            painelMacrosIndependenteUI:show()
-            painelMacrosIndependenteUI:raise()
-            painelMacrosIndependenteUI:focus()
-        end
-    end, getTab("guild"))
 end
+
 function executarFilaCustomizadaHTTP(indice)
     local macroAlvo = MAPA_MACROS_GUILDA[indice]
     if not macroAlvo then
@@ -148,6 +132,18 @@ function executarFilaCustomizadaHTTP(indice)
     end
 end
 
--- DISPARO DE IGNIÇÃO DA INTERFACE INDEPENDENTE
+-- EXPORTAÇÃO GLOBAL DA COORDENADA: Liga o clique do botão local ao painel remoto
+_G.abrirJanelaDeMacrosGlobal = function()
+    if painelMacrosIndependenteUI then
+        if painelMacrosIndependenteUI:isVisible() then
+            painelMacrosIndependenteUI:hide()
+        else
+            painelMacrosIndependenteUI:show()
+            painelMacrosIndependenteUI:raise()
+            painelMacrosIndependenteUI:focus()
+        end
+    end
+end
+
 construirPainelDeMacrosProprio()
 executarFilaCustomizadaHTTP(1)
