@@ -1,8 +1,7 @@
 -- ==========================================================
--- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (VERSÃO COM PAINEL CORRIGIDA)
+-- ARQUIVO REMOTO GITHUB: BAIXADORFILA.LUA (VERSÃO FINAL FIXADA)
 -- ==========================================================
 
--- Lista oficial dos seus 15 slots com nomes humanos e links RAW
 local MAPA_MACROS_GUILDA = {
     { nome = "Anti-Push",        key = "antipush",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/ANTIPUSH.lua" },
     { nome = "Configs Extras",   key = "configs",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Configs_extras.lua" },
@@ -21,16 +20,12 @@ local MAPA_MACROS_GUILDA = {
     { nome = "Abrir Bag Principal",key = "abrirbag",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/AbrirBagPrincipal.lua" }
 }
 
--- Configura a persistência interna para lembrar quais caixas o membro deixou marcadas
 local panelNameStorage = "travaMostWanted"
 if type(storage[panelNameStorage].macrosMarcados) ~= "table" then
     storage[panelNameStorage].macrosMarcados = {}
-    -- Liga todos por padrão na primeira execução para ajudar o membro
     for _, item in ipairs(MAPA_MACROS_GUILDA) do storage[panelNameStorage].macrosMarcados[item.key] = true end
 end
--- Função que vai desenhar fisicamente a lista de escolhas no lado direito da janela
 local function injetarPainelDeEscolhasNaJanela()
-    -- Pega o link da janela que já está aberta na tela do membro
     local root = g_ui.getRootWidget()
     local janelaMestra = nil
     for _, child in pairs(root:getChildren()) do
@@ -39,14 +34,11 @@ local function injetarPainelDeEscolhasNaJanela()
 
     if not janelaMestra then return end
     
-    -- Ajusta o tamanho da janela para caber o menu de escolhas sem cortar informações
     janelaMestra:setSize({width = 540, height = 420})
 
-    -- Se o painel de rolagem já existir ali dentro, destrói para recarregar limpo
     if janelaMestra.painelListaMacros then janelaMestra.painelListaMacros:destroy() end
     if janelaMestra.btnDispararBaixador then janelaMestra.btnDispararBaixador:destroy() end
 
-    -- 1. Cria a caixa de rolagem no lado direito (Isola os macros do texto de segurança)
     local painelListaMacros = g_ui.createWidget("ScrollablePanel", janelaMestra)
     painelListaMacros:setId("painelListaMacros")
     painelListaMacros:setSize({width = 240, height = 300})
@@ -59,18 +51,16 @@ local function injetarPainelDeEscolhasNaJanela()
     layoutVertical:setSpacing(5)
     painelListaMacros:setLayout(layoutVertical)
 
-    -- 2. CORREÇÃO DA LINHA 63: Adicionado o loop legítimo do Lua para ler a tabela
-    for _, macroObj in ipairs(MAPA_MACROS_GUILDA) do
+    -- LOOP 100% CORRIGIDO DE ACORDO COM AS REGRAS DO SEU CLIENT
+    for k, macroObj in ipairs(MAPA_MACROS_GUILDA) do
         local caixaLinha = g_ui.createWidget("CheckBox", painelListaMacros)
         caixaLinha:setText(macroObj.nome)
         caixaLinha:setFont("verdana-11px-rounded")
         caixaLinha:setHeight(16)
         
-        -- Carrega o estado salvo no computador do membro (Marcado ou Desmarcado)
         local statusSalvo = storage[panelNameStorage].macrosMarcados[macroObj.key] == true
         caixaLinha:setChecked(statusSalvo)
         
-        -- Evento de clique: Atualiza o storage instantaneamente quando o membro clica
         caixaLinha.onClick = function(widget)
             local novoEstado = not widget:isChecked()
             widget:setChecked(novoEstado)
@@ -78,7 +68,6 @@ local function injetarPainelDeEscolhasNaJanela()
         end
     end
 
-    -- 3. Cria o botão de ação principal para baixar os selecionados
     local btnDispararBaixador = g_ui.createWidget("Button", janelaMestra)
     btnDispararBaixador:setId("btnDispararBaixador")
     btnDispararBaixador:setText("Injetar Scripts Selecionados")
@@ -95,7 +84,6 @@ local function injetarPainelDeEscolhasNaJanela()
         executarFilaCustomizadaHTTP(1)
     end
 end
--- Função rítmica com delay de 1 segundo que lê as CheckBoxes marcadas e baixa as RAWs
 function executarFilaCustomizadaHTTP(indice)
     local macroAlvo = MAPA_MACROS_GUILDA[indice]
     if not macroAlvo then
@@ -103,7 +91,6 @@ function executarFilaCustomizadaHTTP(indice)
         return
     end
 
-    -- CHECAGEM RÍGIDA: Verifica se o membro deixou essa caixinha marcada na tela
     local estaMarcado = storage[panelNameStorage].macrosMarcados[macroAlvo.key] == true
 
     if estaMarcado then
@@ -121,15 +108,13 @@ function executarFilaCustomizadaHTTP(indice)
                 if compilar then pcall(compilar) else print("[Baixador] Erro no slot " .. macroAlvo.nome .. ": " .. tostring(syntaxErr)) end
             end
 
-            -- Avança o índice da fila cascata após 1 segundo
             schedule(1000, function() executarFilaCustomizadaHTTP(indice + 1) end)
         end)
     else
-        -- Se o membro desmarcou o macro, o bot pula para o próximo link sem dar delay na internet
         executarFilaCustomizadaHTTP(indice + 1)
     end
 end
 
--- PONTO DE DISPARO AUTOMÁTICO: Injeta as CheckBoxes na tela e baixa tudo ao logar se a licença estiver ativa
+-- DISPARO DA INTERFACE
 injetarPainelDeEscolhasNaJanela()
 executarFilaCustomizadaHTTP(1)
