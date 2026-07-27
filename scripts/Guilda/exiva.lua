@@ -1,4 +1,4 @@
-setDefaultTab("main")
+setDefaultTab("GUILD")
 
 -- [CONFIGURAÇÃO E STORAGE]
 if not storage.exivaPro then storage.exivaPro = {} end
