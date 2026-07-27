@@ -1,4 +1,4 @@
-setDefaultTab("HOME")
+setDefaultTab("GUILD")
 
 --[[
 ===================================================
