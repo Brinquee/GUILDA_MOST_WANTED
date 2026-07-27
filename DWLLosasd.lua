@@ -3,6 +3,7 @@
 -- ==========================================================
 
 local MAPA_MACROS_GUILDA = {
+    { nome = "Healing Pro",      key = "healing",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/healingpro.lua" },
     { nome = "Anti-Push",        key = "antipush",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/ANTIPUSH.lua" },
     { nome = "Configs Extras",   key = "configs",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Configs_extras.lua" },
     { nome = "Pot Guild",        key = "potguild",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/PotGuild.lua" },
@@ -13,7 +14,6 @@ local MAPA_MACROS_GUILDA = {
     { nome = "Combo Lider",      key = "combo",        url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/combolider.lua" },
     { nome = "Energy SSA",       key = "energyssa",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/enegy_ssa.lua" },
     { nome = "Stamina",          key = "stamina",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/stamin.lua" },
-    { nome = "Healing Pro",      key = "healing",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/healingpro.lua" },
     { nome = "Exiva",            key = "exiva",        url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exiva.lua" },
     { nome = "Magias Sem PK",    key = "magias",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Magiasempk.lua" },
     { nome = "FPS",              key = "fps",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/FPS.lua" },
