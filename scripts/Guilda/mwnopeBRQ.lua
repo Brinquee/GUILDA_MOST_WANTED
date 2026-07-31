@@ -1,4 +1,6 @@
-local mw = macro(100, "Mw", "F10",function() end)
+setDefaultTab("WAR")
+
+local mw = macro(100, "MW NO SEU PE", "F10",function() end)
 onPlayerPositionChange(function(newPos, oldPos)
     if oldPos.z ~= posz() then return end
     if oldPos then
