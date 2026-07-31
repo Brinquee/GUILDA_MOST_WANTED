@@ -1,4 +1,4 @@
-macro(1000, "Abrir Bag Principal", function()
+macro(1000, "openbagmainBRQ", function()
     bpItem = getBack()
     bp = getContainer(0)
 
