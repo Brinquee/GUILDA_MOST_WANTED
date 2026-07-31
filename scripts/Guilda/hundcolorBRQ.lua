@@ -1,3 +1,5 @@
+setDefaultTab("TOOLS")
+
 local panelName = "hudColors"
 
 if type(storage[panelName]) ~= "table" then
