@@ -4,7 +4,7 @@ onPlayerPositionChange(function(newPos, oldPos)
     if oldPos then
         local tile = g_map.getTile(oldPos)
         if mw.isOn() and tile:isWalkable() then
-            useWith(7382, tile:getTopUseThing())
+            useWith(3188, tile:getTopUseThing())
         end
     end
 end)
