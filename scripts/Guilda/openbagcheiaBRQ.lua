@@ -1,6 +1,6 @@
 setDefaultTab("TOOLS")
 
-macro(1000, "Abrir proxima Bag", function()
+macro(1000, "OPEN PROXIMA BAG", function()
   local containers = getContainers()
   for i, container in pairs(containers) do
     if container:getItemsCount() == container:getCapacity() then
