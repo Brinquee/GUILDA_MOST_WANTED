@@ -1,6 +1,6 @@
-UI.Label("PVP"):setColor("#00BFFF")
+setDefaultTab("WAR")
 UI.Separator()
-UI.Label("Multi-Lider Target"):setColor("#FFFFFF")
+UI.Label("Multi-Lider Target"):setColor("#00BFFF")
 
 if not storage.MultiLeaderAttack then
   storage.MultiLeaderAttack = {}
