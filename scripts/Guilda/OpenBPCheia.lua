@@ -1,3 +1,5 @@
+setDefaultTab("TOOLS")
+
 macro(1000, "Abrir proxima Bag", function()
   local containers = getContainers()
   for i, container in pairs(containers) do
