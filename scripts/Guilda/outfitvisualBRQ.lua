@@ -1,4 +1,4 @@
-setDefaultTab("HOME")
+setDefaultTab("GUILD")
 
 local warPanelName = "warVisualConfigFinal" -- Reset completo para aplicar a lógica real
 
