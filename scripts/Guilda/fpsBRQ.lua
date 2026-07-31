@@ -1,3 +1,4 @@
+setDefaultTab("GUILD")
 ------------------------------------------------------
 local secondsToIdle = 5
 local activeFPS = 60
