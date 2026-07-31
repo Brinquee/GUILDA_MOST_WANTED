@@ -1,3 +1,5 @@
+setDefaultTab("TARGET")
+
 macro(500, "Mudar Perfil do Target", function()
     -- CONFIGURAÇÃO: Altere os nomes abaixo conforme a sua necessidade
     local monstroEspecial = "Minishabaal"   -- Nome do monstro que ativa a mudança
