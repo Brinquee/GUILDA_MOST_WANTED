@@ -1,8 +1,49 @@
-UI.Separator()
-UI.Label("BRINQUE HEALING")
+-- =============================================================================
+-- [PAINEL DE CRÉDITOS E SUPORTE - BRINQUE SCRIPT NATIVO ANIMADO]
+-- =============================================================================
+local version = "2.1"
+local currentVersion
+local available = false
+
+storage.checkVersion = storage.checkVersion or 0
+
+-- 1. Rótulo Principal: Nome da Marca Destacado em Amarelo Ouro Original
+local labelBrinqueMarca = UI.Label("HEALING BRINQUE v" .. version)
+if labelBrinqueMarca then
+    labelBrinqueMarca:setColor("#ffcc00") -- Cor Ouro de Elite
+    labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
+end
+
 UI.Separator()
 
+-- =============================================================================
+-- [MOTOR DE PISCAR SIMPLES] DEGRADE CONTÍNUO EM LOOP DE BACKGROUND (SEM CRASH)
+-- =============================================================================
+macro(150, function()
+    if not labelBrinqueMarca or not btnDiscordOficial then return end
 
+    -- Coleta o tempo atual em ondas matemáticas (Seno de frequência rápida)
+    local tempoOnda = os.clock() * 5
+    local pulsoIntensidade = math.abs(math.sin(tempoOnda))
+    local inverterPulso = 1 - pulsoIntensidade
+
+    -- 1. FAZ A LOGO "BRINQUE SCRIPT" PISCAR EM DEGRADÊ (AMARELO OURO <-> LARANJA WAR)
+    local gLogo = math.floor(100 + (105 * pulsoIntensidade)) -- Oscila o tom de Verde do RGB
+    local corLogoHex = string.format("#FF%02X00", gLogo)
+    labelBrinqueMarca:setColor(corLogoHex)
+
+    -- 2. FAZ O BOTÃO DO DISCORD PISCAR EM NEON CIRCULAR (ACESO <-> SUTIL)
+    local rBtn = math.floor(30 + (55 * inverterPulso))
+    local gBtn = math.floor(150 + (105 * inverterPulso))
+    local corBtnHex = string.format("#%02X%02XFF", rBtn, gBtn)
+    
+    btnDiscordOficial:setColor(corBtnHex)
+    if btnDiscordOficial.setBorderColor then
+        btnDiscordOficial:setBorderColor(corBtnHex)
+    end
+end)
+
+----------
 
 -- TRAVA ANTI-BUG DEFINITIVA: Neutraliza loops fantasmas na memória do client
 if not updateDropUI then function updateDropUI() end end
