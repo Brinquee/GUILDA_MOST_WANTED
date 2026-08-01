@@ -1,3 +1,5 @@
+setDefaultTab("HP") -- Garante que os créditos apareçam na aba HP do Healer
+
 -- =============================================================================
 -- [PAINEL DE CRÉDITOS E SUPORTE - BRINQUE SCRIPT NATIVO ANIMADO]
 -- =============================================================================
@@ -14,33 +16,22 @@ if labelBrinqueMarca then
     labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
 end
 
-UI.Separator()
+
 
 -- =============================================================================
 -- [MOTOR DE PISCAR SIMPLES] DEGRADE CONTÍNUO EM LOOP DE BACKGROUND (SEM CRASH)
 -- =============================================================================
 macro(150, function()
-    if not labelBrinqueMarca or not btnDiscordOficial then return end
+    if not labelBrinqueMarca then return end
 
     -- Coleta o tempo atual em ondas matemáticas (Seno de frequência rápida)
     local tempoOnda = os.clock() * 5
     local pulsoIntensidade = math.abs(math.sin(tempoOnda))
-    local inverterPulso = 1 - pulsoIntensidade
 
-    -- 1. FAZ A LOGO "BRINQUE SCRIPT" PISCAR EM DEGRADÊ (AMARELO OURO <-> LARANJA WAR)
+    -- 1. FAZ A LOGO "HEALING BRINQUE" PISCAR EM DEGRADÊ (AMARELO OURO <-> LARANJA WAR)
     local gLogo = math.floor(100 + (105 * pulsoIntensidade)) -- Oscila o tom de Verde do RGB
     local corLogoHex = string.format("#FF%02X00", gLogo)
     labelBrinqueMarca:setColor(corLogoHex)
-
-    -- 2. FAZ O BOTÃO DO DISCORD PISCAR EM NEON CIRCULAR (ACESO <-> SUTIL)
-    local rBtn = math.floor(30 + (55 * inverterPulso))
-    local gBtn = math.floor(150 + (105 * inverterPulso))
-    local corBtnHex = string.format("#%02X%02XFF", rBtn, gBtn)
-    
-    btnDiscordOficial:setColor(corBtnHex)
-    if btnDiscordOficial.setBorderColor then
-        btnDiscordOficial:setBorderColor(corBtnHex)
-    end
 end)
 
 ----------
