@@ -1,4 +1,4 @@
-setDefaultTab("WAR")
+setDefaultTab("guild")
 
 local mw = macro(100, "MW NO SEU PE", "F10",function() end)
 onPlayerPositionChange(function(newPos, oldPos)
