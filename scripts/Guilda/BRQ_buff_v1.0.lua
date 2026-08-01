@@ -131,7 +131,7 @@ popUpBrinqueBuffEditWindow = setupUI(designPopUpOTUI, widgetRaizDoJogo)
 brinqueBuffWindow:hide()
 popUpBrinqueBuffEditWindow:hide()
 
-local painelDaAbaTools = getTab("tools")
+local painelDaAbaTools = getTab("hp")
 if painelDaAbaTools:recursiveGetChildById("panelBrinqueBuffBotoesNativos") then
     painelDaAbaTools:recursiveGetChildById("panelBrinqueBuffBotoesNativos"):destroy()
 end
