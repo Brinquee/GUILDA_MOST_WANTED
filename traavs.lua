@@ -282,6 +282,10 @@ local MAPA_MACROS_GUILDA = {
 	
 	{ nome = "FUGA COMPLETA BRQ",              key = "fugacompletaBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fugacompletaBRQ.lua" },
 	
+	{ nome = "OLHEIRO_BRQ",              key = "olheiroBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/olheiro_BRQ1.0.lua" },
+
+	{ nome = "ATACKTODOS_BRQ",              key = "atacatodosBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/atacatodosBRQ.lua" },
+	
 	{ nome = "OPEN BAG CHEIA BRQ",key = "openbagcheiaBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" },
 
 	{ nome = "HUND COLOR BRQ",key = "hundcolorBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/hundcolorBRQ.lua" }
