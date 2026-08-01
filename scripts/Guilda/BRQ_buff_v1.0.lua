@@ -6,7 +6,7 @@ local widgetRaizDoJogo = g_ui.getRootWidget()
 local idPainelBrinqueBuff = "janelaBrinqueBuffSetupVis"
 local idPainelEditBrinqueBuff = "janelaBrinqueBuffPopVis"
 
-setDefaultTab("tools") -- Aparece na aba Tools do seu menu lateral
+setDefaultTab("HP") -- Aparece na aba Tools do seu menu lateral
 
 -- =============================================================================
 -- [BLOCO 1] ARMAZENAMENTO DE CONFIGURAÇÕES (TOTALMENTE SEPARADO DO COMBO)
