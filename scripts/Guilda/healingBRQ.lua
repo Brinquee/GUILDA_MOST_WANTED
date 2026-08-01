@@ -1,3 +1,9 @@
+UI.Separator()
+UI.Label("BRINQUE HEALING")
+
+
+
+
 -- TRAVA ANTI-BUG DEFINITIVA: Neutraliza loops fantasmas na memória do client
 if not updateDropUI then function updateDropUI() end end
 if not updateOlheiroUI then function updateOlheiroUI() end end
