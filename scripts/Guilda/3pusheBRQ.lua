@@ -1,4 +1,4 @@
-setDefaultTab("WAR")
+setDefaultTab("guild")
 
 
 -- Definir o estilo PushMaxWindow primeiro
