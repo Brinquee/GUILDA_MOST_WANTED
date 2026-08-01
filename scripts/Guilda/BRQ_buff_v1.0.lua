@@ -1,3 +1,5 @@
+setDefaultTab("HP")
+
 -- TRAVA SUPREMA ANTI-BUG: Limpa o console de resíduos antigos caso o bot retenha loops
 if not updateDropUI then function updateDropUI() end end
 if not updateOlheiroUI then function updateOlheiroUI() end end
