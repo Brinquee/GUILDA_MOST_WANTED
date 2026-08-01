@@ -1,4 +1,4 @@
-setDefaultTab("WAR")
+setDefaultTab("guild")
 
 gpPushDelay = 200 -- safe value: 600ms
 
