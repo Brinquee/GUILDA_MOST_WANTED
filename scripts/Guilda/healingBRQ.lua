@@ -1,6 +1,6 @@
 UI.Separator()
 UI.Label("BRINQUE HEALING")
-
+UI.Separator()
 
 
 
