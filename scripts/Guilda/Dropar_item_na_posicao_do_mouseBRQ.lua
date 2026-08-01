@@ -1,4 +1,4 @@
-setDefaultTab("guild")
+
 
 -- TRAVA SUPREMA ANTI-BUG: Limpa o console de resíduos antigos caso o bot retenha loops
 if not updateDropUI then function updateDropUI() end end
@@ -8,7 +8,7 @@ local widgetRaizDoJogo = g_ui.getRootWidget()
 local idPainelDrop = "janelaDropWarExemplo"
 local idPainelEditDrop = "janelaDropWarEditPop"
 
-setDefaultTab("tools") -- Define a aba onde o painel aparecerá
+setDefaultTab("GUILD") -- Define a aba onde o painel aparecerá
 
 -- =============================================================================
 -- [BLOCO 1] ARMAZENAMENTO DE DADOS (STORAGE GLOBAL)
