@@ -12,7 +12,7 @@ storage.checkVersion = storage.checkVersion or 0
 -- 1. Rótulo Principal: Nome da Marca Destacado em Amarelo Ouro Original
 local labelBrinqueMarca = UI.Label("CENTRAL DE PUXE v" .. version)
 if labelBrinqueMarca then
-    labelBrinqueMarca:setColor("#ffcc00") -- Cor Ouro de Elite
+    labelBrinqueMarca:setColor("#00BFFF") -- Cor Ouro de Elite
     labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
 end
 
