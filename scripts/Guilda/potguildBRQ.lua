@@ -1,4 +1,6 @@
 setDefaultTab("GUILD")
+UI.Separator()
+UI.Label("Multi-Lider Target"):setColor("#00BFFF")
 
 --[[
 ===================================================
