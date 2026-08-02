@@ -15,8 +15,8 @@ setDefaultTab("HP") -- Aparece na aba Tools do seu menu lateral
 if not storage.brinqueBuffSimpleEngine then
     storage.brinqueBuffSimpleEngine = {
         palavraSpell = "utito tempo san",
-        tempoCooldown = 2000,
-        idDoIcone = 37110,
+        tempoCooldown = 1000,
+        idDoIcone = 37063,
         posicaoIcone = {x = 320, y = 320}
     }
 end
