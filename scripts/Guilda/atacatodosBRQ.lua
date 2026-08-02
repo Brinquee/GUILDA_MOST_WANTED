@@ -1,3 +1,5 @@
+setDefaultTab("GUILD") -- Garante que os créditos apareçam na aba HP do Healer
+
 local targetPanelName = "targetShieldsConfigV2" -- Reset de cache para corrigir as IDs invertidas
 
 -- Inicializa o armazenamento das configurações (Limpo e corrigido)
