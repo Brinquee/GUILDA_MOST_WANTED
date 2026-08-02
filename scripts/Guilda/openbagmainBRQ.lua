@@ -1,3 +1,6 @@
+UI.Separator()
+setDefaultTab("TOOLS")
+
 macro(1000, "openbagmainBRQ", function()
     bpItem = getBack()
     bp = getContainer(0)
