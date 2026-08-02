@@ -1,18 +1,17 @@
+UI.Separator()
 setDefaultTab("GUILD") -- Garante que os créditos apareçam na aba HP do Healer
 
 -- =============================================================================
 -- [PAINEL DE CRÉDITOS E SUPORTE - BRINQUE SCRIPT NATIVO ANIMADO]
 -- =============================================================================
-local version = "1.1"
 local currentVersion
 local available = false
 
-storage.checkVersion = storage.checkVersion or 0
 
--- 1. Rótulo Principal: Nome da Marca Destacado em Amarelo Ouro Original
-local labelBrinqueMarca = UI.Label("CENTRAL DE PUXE v" .. version)
+-- 1. Rótulo Principal: Nome da Marca Destacado em Vermelho Original
+local labelBrinqueMarca = UI.Label("V  CENTRAL DE PUSHE  V")
 if labelBrinqueMarca then
-    labelBrinqueMarca:setColor("#00BFFF") -- Cor Ouro de Elite
+    labelBrinqueMarca:setColor("#ff0000") -- Cor Vermelho de Elite
     labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
 end
 
@@ -28,9 +27,9 @@ macro(150, function()
     local tempoOnda = os.clock() * 5
     local pulsoIntensidade = math.abs(math.sin(tempoOnda))
 
-    -- 1. FAZ A LOGO "HEALING BRINQUE" PISCAR EM DEGRADÊ (AMARELO OURO <-> LARANJA WAR)
-    local gLogo = math.floor(100 + (105 * pulsoIntensidade)) -- Oscila o tom de Verde do RGB
-    local corLogoHex = string.format("#FF%02X00", gLogo)
+    -- 1. FAZ A LOGO "HEALING BRINQUE" PISCAR EM DEGRADÊ DE VERMELHO (VIVO <-> ESCURO)
+    local rLogo = math.floor(100 + (155 * pulsoIntensidade)) -- Oscila a intensidade do Vermelho
+    local corLogoHex = string.format("#%02X0000", rLogo)
     labelBrinqueMarca:setColor(corLogoHex)
 end)
 
@@ -1398,3 +1397,4 @@ macro(50, function()
   end
 end)
 
+UI.Separator()
