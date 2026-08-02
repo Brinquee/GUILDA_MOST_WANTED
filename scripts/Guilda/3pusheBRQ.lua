@@ -1,4 +1,39 @@
-setDefaultTab("GUILD")
+setDefaultTab("GUILD") -- Garante que os créditos apareçam na aba HP do Healer
+
+-- =============================================================================
+-- [PAINEL DE CRÉDITOS E SUPORTE - BRINQUE SCRIPT NATIVO ANIMADO]
+-- =============================================================================
+local version = "1.1"
+local currentVersion
+local available = false
+
+storage.checkVersion = storage.checkVersion or 0
+
+-- 1. Rótulo Principal: Nome da Marca Destacado em Amarelo Ouro Original
+local labelBrinqueMarca = UI.Label("CENTRAL DE PUXE v" .. version)
+if labelBrinqueMarca then
+    labelBrinqueMarca:setColor("#ffcc00") -- Cor Ouro de Elite
+    labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
+end
+
+
+
+-- =============================================================================
+-- [MOTOR DE PISCAR SIMPLES] DEGRADE CONTÍNUO EM LOOP DE BACKGROUND (SEM CRASH)
+-- =============================================================================
+macro(150, function()
+    if not labelBrinqueMarca then return end
+
+    -- Coleta o tempo atual em ondas matemáticas (Seno de frequência rápida)
+    local tempoOnda = os.clock() * 5
+    local pulsoIntensidade = math.abs(math.sin(tempoOnda))
+
+    -- 1. FAZ A LOGO "HEALING BRINQUE" PISCAR EM DEGRADÊ (AMARELO OURO <-> LARANJA WAR)
+    local gLogo = math.floor(100 + (105 * pulsoIntensidade)) -- Oscila o tom de Verde do RGB
+    local corLogoHex = string.format("#FF%02X00", gLogo)
+    labelBrinqueMarca:setColor(corLogoHex)
+end)
+
 
 
 -- Definir o estilo PushMaxWindow primeiro
