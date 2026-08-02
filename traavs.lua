@@ -247,23 +247,27 @@ local MAPA_MACROS_GUILDA = {
 	
 	{ nome = "BUFF BRQ",    key = "BRQbuff",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/BRQ_buff_v1.0.lua" },
 	
-	{ nome = "PUXAR AO REDOR BRQ",        key = "puxaraoredorBRQ",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/puxaraoredorBRQ.lua" },
-	
 	{ nome = "FILTRO BATTLE BRQ",    key = "filtrobatleBRQ",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/filtrobatleBRQ.lua" },
-											-- MACROS SEM PRIORIDADE --
-
 	
-
+											-- MACROS SEM PRIORIDADE --
 
     { nome = "SKILLS BRQ",           key = "skillsBRQ",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/skillsBRQ.lua" },
 	
-    { nome = "RAINBOW COLOR BRQ",    key = "rainbowcolorBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/rainbowcolorBRQ.lua" },
-	
     { nome = "COMBO LIDER BRQ",      key = "comboliderBRQ",        url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/comboliderBRQ.lua" },
-	
+
+	{ nome = "OUTFIT VISUAL BRQ",   key = "outfitvisualBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/outfitvisualBRQ.lua" },
+
+	{ nome = "ATACKTODOS_BRQ",              key = "atacatodosBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/atacatodosBRQ.lua" },
 											-- MACROS DA AUTOMATICO GUILDA --
+	
 	{ nome = "3 PUSHE BRQ",             key = "3pusheBRQ",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/3pusheBRQ.lua" },
-												
+
+    { nome = "ANTPUSHE MOUSE-PE BRQ",              key = "antpushemousepeBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Dropar_item_na_posicao_do_mouseBRQ.lua" },
+	
+    { nome = "MW NO PE",              key = "MWPE",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/mwnopeBRQ.lua" },
+	
+	{ nome = "PUXAR AO REDOR BRQ",        key = "puxaraoredorBRQ",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/puxaraoredorBRQ.lua" },
+	
     { nome = "STAMINA BRQ",          key = "staminaBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/staminaBRQ.lua" },
 	
     { nome = "EXIVA BRQ",            key = "exivaBRQ",        url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exivaBRQ.lua" },
@@ -272,23 +276,17 @@ local MAPA_MACROS_GUILDA = {
 	
     { nome = "FPS BRQ",              key = "fpsBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fpsBRQ.lua" },
 	
-	{ nome = "OUTFIT VISUAL BRQ",   key = "outfitvisualBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/outfitvisualBRQ.lua" },
-	
-    { nome = "ANTPUSHE MOUSE-PE BRQ",              key = "antpushemousepeBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Dropar_item_na_posicao_do_mouseBRQ.lua" },
-	
-    { nome = "MW NO PE",              key = "MWPE",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/mwnopeBRQ.lua" },
-	
 	{ nome = "TARGET PLAY OFF",              key = "targetplayoffBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/targetplayoffBRQ.lua" },
 	
 	{ nome = "FUGA COMPLETA BRQ",              key = "fugacompletaBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fugacompletaBRQ.lua" },
 	
 	{ nome = "OLHEIRO_BRQ",              key = "olheiroBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/olheiro_BRQ1.0.lua" },
-
-	{ nome = "ATACKTODOS_BRQ",              key = "atacatodosBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/atacatodosBRQ.lua" },
+	 
+											-- MACROS TOOLS --
+    { nome = "RAINBOW COLOR BRQ",    key = "rainbowcolorBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/rainbowcolorBRQ.lua" },
 	
-	{ nome = "OPEN BAG CHEIA BRQ",key = "openbagcheiaBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" },
-
-	{ nome = "HUND COLOR BRQ",key = "hundcolorBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/hundcolorBRQ.lua" }
+	{ nome = "HUND COLOR BRQ",key = "hundcolorBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/hundcolorBRQ.lua" },
+		{ nome = "OPEN BAG CHEIA BRQ",key = "openbagcheiaBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" }
 
 }
 
