@@ -48,7 +48,7 @@ local configName = modules.game_bot.contentsPanel.config:getCurrentOption().text
 local pathBase = "/bot/" .. configName .. "/Imagens/"
 
 
-local imgFixa = pathBase .. "brinquecustom" 
+local imgFixa = pathBase .. "custompremium" 
 
 -- Função para aplicar a imagem
 local function changeBotImage(path)
@@ -75,7 +75,7 @@ local function updateButtonsBot()
   modules.game_bot.botWindow:setBackgroundColor("black")
   modules.game_bot.botWindow:setBorderWidth(1)
   modules.game_bot.botWindow:setBorderColor("black")
-  modules.game_bot.botWindow:setText("BRINQUE")
+  modules.game_bot.botWindow:setText("BRINQUE PREMIUM")
   modules.game_bot.botWindow:setFont("verdana-11px-rounded")
   modules.game_bot.botWindow:setColor("red")
 end
