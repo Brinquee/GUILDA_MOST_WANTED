@@ -18,8 +18,8 @@ local config = storage[panelName]
 -- =============================================================================
 -- [BLOCO 1] CONFIGURACOES DE LINKS E SEGURANCA
 -- =============================================================================
-local LINK_INSTAGRAM = "https://instagram.com"
-local LINK_WHATSAPP  = "https://whatsapp.com"
+local LINK_INSTAGRAM = "https://www.instagram.com/brinquescriptsgamer?igsh=dXhhN2MxNWhxMm9m"
+local LINK_WHATSAPP  = "https://chat.whatsapp.com/D4WHVuAy41t6uQ6QZ3ibtR"
 local LINK_DISCORD   = "https://discord.gg"
 local LINK_YOUTUBE   = "https://youtube.com"
 
