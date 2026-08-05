@@ -2,7 +2,7 @@ setDefaultTab("guild")
 
 gpPushDelay = 200 -- safe value: 600ms
 
-macro(gpPushDelay, "PUXAR AO REDOR", "delete", function()
+macro(gpPushDelay, "PUXAR AO REDOR", function()
         push(0, -1, 0)
         push(0, 1, 0)
         push(-1, -1, 0)
