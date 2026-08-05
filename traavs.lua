@@ -20,7 +20,7 @@ local config = storage[panelName]
 -- =============================================================================
 local LINK_INSTAGRAM = "https://www.instagram.com/brinquescriptsgamer?igsh=dXhhN2MxNWhxMm9m"
 local LINK_WHATSAPP  = "https://chat.whatsapp.com/D4WHVuAy41t6uQ6QZ3ibtR"
-local LINK_DISCORD   = "https://discord.gg"
+local LINK_DISCORD   = "https://discord.gg/BRNzJ7cZjq"
 local LINK_YOUTUBE   = "https://youtube.com"
 
 local CHAR_VALIDADOR = "Gerente Most"
