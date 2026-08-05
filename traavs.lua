@@ -15,15 +15,14 @@ end
 
 local config = storage[panelName]
 
--- ==========================================================
--- CONFIGURE AQUI LINKS REAIS (AGORA ELES ABREM O NAVEGADOR DE VERDADE!)
--- ==========================================================
+-- =============================================================================
+-- [BLOCO 1] CONFIGURACOES DE LINKS E SEGURANCA
+-- =============================================================================
 local LINK_INSTAGRAM = "https://instagram.com"
 local LINK_WHATSAPP  = "https://whatsapp.com"
 local LINK_DISCORD   = "https://discord.gg"
 local LINK_YOUTUBE   = "https://youtube.com"
 
--- CONFIGURACOES DE PROTECAO REMOTA DA DINASTIA CELESTIAL
 local CHAR_VALIDADOR = "Gerente Most"
 local COMANDO_LOG     = "!sincronizar"
 local CHAVE_ASSINATURA_INTERNA = "MOST_WANTED_SECRET_KEY_2026"
@@ -60,7 +59,6 @@ local function tirarCifraDoTexto(dadosEscondidos)
     return resultado
 end
 local widgetRaizDoJogo = g_ui.getRootWidget()
-
 -- JANELA 1: STATUS DA LICENCA
 local setupTravaWindow = setupUI([[
 MainWindow
@@ -126,78 +124,8 @@ MainWindow
 ]], widgetRaizDoJogo)
 setupTravaWindow:hide()
 
--- JANELA 2 CORRIGIDA: Montada usando a formatacao de blocos concatenados que seu client exige para nao sumir itens!
--- SUBISTITUA APENAS O BLOCO DA JANELA 2 NA SUA PARTE 2 POR ESTA VERSÃO EM CAMADAS:
-local widgetRaizDoJogo = g_ui.getRootWidget()
-
--- JANELA 1: STATUS DA LICENCA
-local setupTravaWindow = setupUI([[
-MainWindow
-  id: janelaLicenca
-  !text: tr('Status da Licenca - Mercenarios Celestiais')
-  size: 350 200
-  @onEscape: self:hide()
-
-  Label
-    id: lblStatus
-    anchors.top: parent.top
-    anchors.left: parent.left
-    margin-top: 12
-    margin-left: 12
-    text: Status: Carregando...
-    font: verdana-11px-rounded
-
-  Label
-    id: lblDataInicio
-    anchors.top: lblStatus.bottom
-    anchors.left: parent.left
-    margin-top: 10
-    margin-left: 12
-    text: Data da Sincronizacao: --/--/----
-    font: verdana-11px-rounded
-    color: #bdbdbd
-
-  Label
-    id: lblDataFinal
-    anchors.top: lblDataInicio.bottom
-    anchors.left: parent.left
-    margin-top: 10
-    margin-left: 12
-    text: Data de Expiracao: --/--/----
-    font: verdana-11px-rounded
-    color: #44ff44
-
-  Label
-    id: lblTempoRestante
-    anchors.top: lblDataFinal.bottom
-    anchors.left: parent.left
-    margin-top: 10
-    margin-left: 12
-    text: Tempo Restante: Calculando...
-    font: verdana-11px-rounded
-    color: #e6bc22
-
-  HorizontalSeparator
-    id: sep
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: closeButton.top
-    margin-bottom: 8
-
-  Button
-    id: closeButton
-    !text: tr('Close')
-    font: cipsoftFont
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
-    size: 45 21
-    @onClick: self:getParent():hide()
-]], widgetRaizDoJogo)
-setupTravaWindow:hide()
-
--- JANELA 2 MODIFICADA: Fundo do castelo + Imagens personalizadas nos botoes!
-local setupMacrosWindow = setupUI(
-"MainWindow\n" ..
+-- JANELA 2 OFICIAL DEFINITIVA: CALIBRAGEM RESTRITA DE CLIQUES (SISTEMA ANCHORS.CENTERIN)
+local designPrincipalOTUI = "MainWindow\n" ..
 "  id: janelaEscolhaMacros\n" ..
 "  size: 560 380\n" ..
 "  @onEscape: self:hide()\n" ..
@@ -206,19 +134,19 @@ local setupMacrosWindow = setupUI(
 "  border: 0 alpha\n" ..
 "  padding: 0\n" ..
 "\n" ..
-"  -- CAMADA 1: Imagem do castelo esticada no fundo de forma arrastavel\n" ..
 "  UIWidget\n" ..
 "    id: imgFundoCustomCelestiais\n" ..
-"    image-source: /bot/BRINQUE/imagens/minimalistum.png\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/M_custompremium.png\n" ..
 "    image-smooth: true\n" ..
 "    image-fixed-ratio: false\n" ..
 "    anchors.fill: parent\n" ..
+"    margin: -5\n" ..
 "    phantom: true\n" ..
 "\n" ..
-"  -- CAMADA 2: Filtro escuro para garantir a leitura do menu\n" ..
 "  Panel\n" ..
 "    background-color: #00000055\n" ..
 "    anchors.fill: parent\n" ..
+"    margin: -5\n" ..
 "    phantom: true\n" ..
 "\n" ..
 "  ScrollablePanel\n" ..
@@ -240,11 +168,11 @@ local setupMacrosWindow = setupUI(
 "    id: barraRolagem\n" ..
 "    anchors.top: parent.top\n" ..
 "    anchors.bottom: sepInf.top\n" ..
-"    anchors.right: parent.horizontalCenter\n" ..
+"    anchors.right: lblRedesTitulo.left\n" ..
 "    margin-top: 10\n" ..
 "    margin-bottom: 5\n" ..
-"    margin-right: 15\n" ..
-"    step: 14\n" ..
+"    margin-right: 5\n" ..
+"    step: 20\n" ..
 "    pixels-scroll: true\n" ..
 "\n" ..
 "  Label\n" ..
@@ -259,74 +187,101 @@ local setupMacrosWindow = setupUI(
 "    margin-left: 15\n" ..
 "    text-align: center\n" ..
 "\n" ..
-"  -- BOTOES COM IMAGENS INTEGRADAS AQUI:\n" ..
-"  Button\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoInsta\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: lblRedesTitulo.bottom\n" ..
+"    anchors.left: parent.horizontalCenter\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: -65\n" ..
+"    margin-left: 20\n" ..
+"    margin-right: 15\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
 "    id: btnInstagram\n" ..
 "    text: Acessar Instagram\n" ..
 "    font: verdana-11px-rounded\n" ..
 "    color: #ffffff\n" ..
-"    image-source: /bot/BRINQUE/imagens/BOTAO.png\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -5\n" ..
+"    phantom: false\n" ..
+"    anchors.centerIn: imgFundoInsta\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoWhats\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
 "    image-smooth: true\n" ..
-"    image-border: 0\n" ..
-"    change-color-on-hover: true\n" ..
-"    anchors.top: lblRedesTitulo.bottom\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: imgFundoInsta.bottom\n" ..
 "    anchors.left: parent.horizontalCenter\n" ..
 "    anchors.right: parent.right\n" ..
-"    margin-top: 15\n" ..
-"    margin-left: 20\n" ..
+"    margin-top: -165\n" ..
+"    margin-left: 30\n" ..
 "    margin-right: 15\n" ..
-"    height: 22\n" ..
-"\n" ..
-"  Button\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
 "    id: btnWhatsApp\n" ..
 "    text: Grupo do WhatsApp\n" ..
 "    font: verdana-11px-rounded\n" ..
 "    color: #ffffff\n" ..
-"    image-source: /bot/BRINQUE/imagens/BOTAO.png\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -5\n" ..
+"    phantom: false\n" ..
+"    anchors.centerIn: imgFundoWhats\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoDiscord\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
 "    image-smooth: true\n" ..
-"    image-border: 0\n" ..
-"    change-color-on-hover: true\n" ..
-"    anchors.top: btnInstagram.bottom\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: imgFundoWhats.bottom\n" ..
 "    anchors.left: parent.horizontalCenter\n" ..
 "    anchors.right: parent.right\n" ..
-"    margin-top: 10\n" ..
+"    margin-top: -165\n" ..
 "    margin-left: 20\n" ..
 "    margin-right: 15\n" ..
-"    height: 22\n" ..
-"\n" ..
-"  Button\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
 "    id: btnDiscord\n" ..
 "    text: Servidor do Discord\n" ..
 "    font: verdana-11px-rounded\n" ..
 "    color: #ffffff\n" ..
-"    image-source: /bot/BRINQUE/imagens/BOTAO.png\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -5\n" ..
+"    phantom: false\n" ..
+"    anchors.centerIn: imgFundoDiscord\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoYoutube\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
 "    image-smooth: true\n" ..
-"    image-border: 0\n" ..
-"    change-color-on-hover: true\n" ..
-"    anchors.top: btnWhatsApp.bottom\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: imgFundoDiscord.bottom\n" ..
 "    anchors.left: parent.horizontalCenter\n" ..
 "    anchors.right: parent.right\n" ..
-"    margin-top: 10\n" ..
+"    margin-top: -165\n" ..
 "    margin-left: 20\n" ..
 "    margin-right: 15\n" ..
-"    height: 22\n" ..
-"\n" ..
-"  Button\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
 "    id: btnYouTube\n" ..
 "    text: Canal do YouTube\n" ..
 "    font: verdana-11px-rounded\n" ..
 "    color: #ffffff\n" ..
-"    image-source: /bot/BRINQUE/imagens/BOTAO.png\n" ..
-"    image-smooth: true\n" ..
-"    image-border: 0\n" ..
-"    change-color-on-hover: true\n" ..
-"    anchors.top: btnDiscord.bottom\n" ..
-"    anchors.left: parent.horizontalCenter\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: 10\n" ..
-"    margin-left: 20\n" ..
-"    margin-right: 15\n" ..
-"    height: 22\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -5\n" ..
+"    phantom: false\n" ..
+"    anchors.centerIn: imgFundoYoutube\n" ..
 "\n" ..
 "  HorizontalSeparator\n" ..
 "    id: sepInf\n" ..
@@ -337,17 +292,40 @@ local setupMacrosWindow = setupUI(
 "\n" ..
 "  Button\n" ..
 "    id: closeBtn\n" ..
-"    !text: tr('Close')\n" ..
+"    text: Fechar\n" ..
 "    font: cipsoftFont\n" ..
 "    anchors.right: parent.right\n" ..
 "    anchors.bottom: parent.bottom\n" ..
 "    size: 60 20\n" ..
 "    margin-bottom: 5\n" ..
 "    margin-right: 15\n" ..
-"    @onClick: self:getParent():hide()\n", widgetRaizDoJogo)
+"    @onClick: self:getParent():hide()\n"
+
+local setupMacrosWindow = setupUI(designPrincipalOTUI, widgetRaizDoJogo)
 setupMacrosWindow:hide()
 
--- Função de Redirecionamento de URL nativa capturada do seu exemplo do Brinque
+-- =============================================================================
+-- [BLOCO 3] FILTRO AUTO-INJETOR E PROTETOR DE SEPARADORES
+-- =============================================================================
+local pastaImg = "/bot/CUSTOM_PREMIUM/imagens/"
+local mapeamentoBotoesImagens = {
+    { widget = setupMacrosWindow.imgFundoInsta,   file = "butaoazulverme.png" },
+    { widget = setupMacrosWindow.imgFundoWhats,   file = "butaoazulverme.png" },
+    { widget = setupMacrosWindow.imgFundoDiscord, file = "butaoazulverme.png" },
+    { widget = setupMacrosWindow.imgFundoYoutube, file = "butaoazulverme.png" }
+}
+
+for _, itemBtn in ipairs(mapeamentoBotoesImagens) do
+    local caminhoCompletoFoto = pastaImg .. itemBtn.file
+    if not g_resources.fileExists(caminhoCompletoFoto) then
+        itemBtn.widget:setImageSource("")
+        itemBtn.widget:setBackgroundColor("#2f2f2f")
+    end
+end
+
+-- =============================================================================
+-- [BLOCO 4] REDIRECIONAMENTO DE LINKS REAIS E COMPONENTES DA LISTA
+-- =============================================================================
 local function abrirLinkNoNavegadorReal(urlDestino)
     if g_signals and g_signals.openUrl then
         g_signals.openUrl(urlDestino)
@@ -358,7 +336,6 @@ local function abrirLinkNoNavegadorReal(urlDestino)
     end
 end
 
--- Atribui os novos gatilhos reais nos botões que agora vão carregar na tela
 setupMacrosWindow.btnInstagram.onClick = function() abrirLinkNoNavegadorReal(LINK_INSTAGRAM) end
 setupMacrosWindow.btnWhatsApp.onClick  = function() abrirLinkNoNavegadorReal(LINK_WHATSAPP) end
 setupMacrosWindow.btnDiscord.onClick   = function() abrirLinkNoNavegadorReal(LINK_DISCORD) end
@@ -423,21 +400,24 @@ local MAPA_MACROS_GUILDA = {
     -- MACROS COM PRIORIDADE (HEALING)
     -- ==========================================
     { nome = "HEALING BRQ",          key = "healingBRQ",         cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/healingBRQ.lua" },
-    { nome = "OPEN BAG MAIN BRQ",    key = "openbagmainBRQ",     cat = "EXTRAS",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagmainBRQ.lua" },
+    { nome = "OPEN BAG MAIN BRQ",    key = "openbagmainBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagmainBRQ.lua" },
     { nome = "BLESSED HP/MP BRQ",    key = "blessedhpmpBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/blessed_hpmpBRQ.lua" },
     { nome = "ENEGY-SSA-MIGHT BRQ",  key = "energyssamightBRQ",  cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/enegy_ssa_mightBRQ.lua" },
+	{ nome = "FILTRO BATTLE BRQ",    key = "filtrobatleBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Painel.lua" },
     { nome = "POT GUILD BRQ",        key = "potguildBRQ",        cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/potguildBRQ.lua" },
     { nome = "BUFF BRQ",             key = "BRQbuff",            cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/BRQ_buff_v1.0.lua" },
-    { nome = "FILTRO BATTLE BRQ",    key = "filtrobatleBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/filtrobatleBRQ.lua" },
+	{ nome = "STAMINA BRQ",          key = "staminaBRQ",         cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/staminaBRQ.lua" },
+
 
     -- ==========================================
     -- MACROS SEM PRIORIDADE (CAVE/TARGET)
     -- ==========================================
-    { nome = "SKILLS BRQ",           key = "skillsBRQ",          cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/skillsBRQ.lua" },
+    { nome = "FUGA COMPLETA BRQ",    key = "fugacompletaBRQ",    cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fugacompletaBRQ.lua" },
+    { nome = "OLHEIRO_BRQ",          key = "olheiroBRQ",         cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/olheiro_BRQ1.0.lua" },
     { nome = "COMBO LIDER BRQ",      key = "comboliderBRQ",      cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/comboliderBRQ.lua" },
     { nome = "OUTFIT VISUAL BRQ",    key = "outfitvisualBRQ",    cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/outfitvisualBRQ.lua" },
     { nome = "ATACKTODOS_BRQ",       key = "atacatodosBRQ",      cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/atacatodosBRQ.lua" },
-
+    { nome = "TARGET PLAY OFF",      key = "targetplayoffBRQ",   cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/targetplayoffBRQ.lua" },
     -- ==========================================
     -- MACROS DA AUTOMATICO GUILDA (WAR)
     -- ==========================================
@@ -445,22 +425,19 @@ local MAPA_MACROS_GUILDA = {
     { nome = "ANTPUSHE MOUSE-PE BRQ", key = "antpushemousepeBRQ", cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Dropar_item_na_posicao_do_mouseBRQ.lua" },
     { nome = "MW NO PE",             key = "MWPE",               cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/mwnopeBRQ.lua" },
     { nome = "PUXAR AO REDOR BRQ",   key = "puxaraoredorBRQ",    cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/puxaraoredorBRQ.lua" },
-    { nome = "STAMINA BRQ",          key = "staminaBRQ",         cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/staminaBRQ.lua" },
     { nome = "EXIVA BRQ",            key = "exivaBRQ",           cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exivaBRQ.lua" },
-    { nome = "MAGIAS S/PK BRQ",      key = "magiasempkBRQ",      cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/magiasempkBRQ.lua" },
-    { nome = "FPS BRQ",              key = "fpsBRQ",             cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fpsBRQ.lua" },
-    { nome = "TARGET PLAY OFF",      key = "targetplayoffBRQ",   cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/targetplayoffBRQ.lua" },
-    { nome = "FUGA COMPLETA BRQ",    key = "fugacompletaBRQ",    cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fugacompletaBRQ.lua" },
-    { nome = "OLHEIRO_BRQ",          key = "olheiroBRQ",         cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/olheiro_BRQ1.0.lua" },
 
     -- ==========================================
-    -- MACROS TOOLS (TOOLS)
+    -- MACROS EXTRAS (EXTRAS)
     -- ==========================================
+	{ nome = "FILTRO BATTLE BRQ",    key = "filtrobatleBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/filtrobatleBRQ" },
+	{ nome = "SKILLS BRQ",           key = "skillsBRQ",          cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/skillsBRQ.lua" },
+    { nome = "FPS BRQ",              key = "fpsBRQ",             cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fpsBRQ.lua" },
     { nome = "RAINBOW COLOR BRQ",    key = "rainbowcolorBRQ",    cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/rainbowcolorBRQ.lua" },
     { nome = "HUND COLOR BRQ",       key = "hundcolorBRQ",       cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/hundcolorBRQ.lua" },
-    { nome = "OPEN BAG CHEIA BRQ",   key = "openbagcheiaBRQ",    cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" }
+    { nome = "OPEN BAG CHEIA BRQ",   key = "openbagcheiaBRQ",    cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" },
+	{ nome = "MAGIAS S/PK BRQ",      key = "magiasempkBRQ",      cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/magiasempkBRQ.lua" }
 }
-
 
 
 local ORDEM_CATEGORIAS = { "HEALING", "CAVE/TARGET", "WAR", "EXTRAS" }
@@ -490,6 +467,10 @@ for _, nomeCat in ipairs(ORDEM_CATEGORIAS) do
         end
     end
 end
+
+-- =============================================================================
+-- [BLOCO 5] EXECUTOR DE FILA HTTP E SINCRO DE LICENCA
+-- =============================================================================
 local loteJaEstaSendoBaixado = false
 local function executarFilaCustomizadaHTTP(indice)
     if indice == 1 then if loteJaEstaSendoBaixado then return end loteJaEstaSendoBaixado = true end
@@ -508,7 +489,6 @@ local function executarFilaCustomizadaHTTP(indice)
         executarFilaCustomizadaHTTP(indice + 1)
     end
 end
-
 function atualizarTextosDoPainel()
     if not setupTravaWindow:isVisible() then return end
     if not modules._G.g_resources.fileExists(path_licenca_json) then return end
