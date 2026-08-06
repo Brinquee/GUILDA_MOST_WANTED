@@ -9,7 +9,7 @@ if not storage.exivaPro.guildTarget then storage.exivaPro.guildTarget = "" end
 if not storage.exivaPro.mode then storage.exivaPro.mode = "none" end
 
 local config = storage.exivaPro
-local imgPath = "/bot/BRINQUE/imagens/stylesense.png"
+local imgPath = "/bot/CUSTOM_PREMIUM/imagens/stylesense.png"
 
 -- [SISTEMA DA SETA VISUAL]
 local widgetArrow = setupUI([[
