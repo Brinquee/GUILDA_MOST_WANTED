@@ -46,7 +46,7 @@ Panel
     BattlePlayers
       id: players
       anchors.left: parent.left
-      margin-left: 25
+      margin-left: 5
       image-source: /images/game/battle/battle_players
       border-width: 1
 
@@ -77,6 +77,13 @@ Panel
       margin-left: 10
       image-source: /images/game/battle/battle_party
       border-width: 1
+
+    BattleParty
+      id: redshield
+      anchors.left: prev.right
+      margin-left: 10
+      image-source: /images/game/battle/battle_party
+      border-width: 1
 ]], parent)
 
 storage.FiltroPlayers = storage.FiltroPlayers or false
@@ -84,6 +91,7 @@ storage.FiltroNpcs = storage.FiltroNpcs or false
 storage.FiltroMobs = storage.FiltroMobs or false
 storage.FiltroSkull = storage.FiltroSkull or false
 storage.FiltroParty = storage.FiltroParty or false
+storage.FiltroRedShield = storage.FiltroRedShield or false
 
 macro(50, function()
   if not FiltroPainel then return end
@@ -105,12 +113,14 @@ macro(50, function()
   FiltroPainel.icons.mobs:setBorderColor(storage.FiltroMobs and "#FF0000" or "#FFFFFF")
   FiltroPainel.icons.sempk:setBorderColor(storage.FiltroSkull and "#FF0000" or "#FFFFFF")
   FiltroPainel.icons.party:setBorderColor(storage.FiltroParty and "#FF0000" or "#FFFFFF")
+  FiltroPainel.icons.redshield:setBorderColor(storage.FiltroRedShield and "#FF0000" or "#FFFFFF")
   
   FiltroPainel.icons.players:setImageColor(storage.FiltroPlayers and '#696969' or '#FFFFFF')
   FiltroPainel.icons.npcs:setImageColor(storage.FiltroNpcs and '#696969' or '#FFFFFF')
   FiltroPainel.icons.mobs:setImageColor(storage.FiltroMobs and '#696969' or '#FFFFFF')
   FiltroPainel.icons.sempk:setImageColor(storage.FiltroSkull and '#696969' or '#FFFFFF')
   FiltroPainel.icons.party:setImageColor(storage.FiltroParty and '#696969' or '#FFFFFF')
+  FiltroPainel.icons.redshield:setImageColor(storage.FiltroRedShield and '#696969' or '#FFFFFF')
 end)
 
 FiltroPainel.icons.players.onClick = function() storage.FiltroPlayers = not storage.FiltroPlayers end
@@ -118,6 +128,7 @@ FiltroPainel.icons.npcs.onClick = function() storage.FiltroNpcs = not storage.Fi
 FiltroPainel.icons.mobs.onClick = function() storage.FiltroMobs = not storage.FiltroMobs end
 FiltroPainel.icons.sempk.onClick = function() storage.FiltroSkull = not storage.FiltroSkull end
 FiltroPainel.icons.party.onClick = function() storage.FiltroParty = not storage.FiltroParty end
+FiltroPainel.icons.redshield.onClick = function() storage.FiltroRedShield = not storage.FiltroRedShield end
 
 FiltrarBattle = macro(1, function() end)
 modules.game_battle.doCreatureFitFilters = function(creature)
@@ -126,7 +137,19 @@ modules.game_battle.doCreatureFitFilters = function(creature)
     if creature:isMonster() and storage.FiltroMobs then return false end
     if creature:isPlayer() and storage.FiltroPlayers then return false end
     if creature:isNpc() and storage.FiltroNpcs then return false end
+    
+    -- Filtro Party Comum Original
     if creature:isPlayer() and (creature:getEmblem() == 1 or creature:getShield() >= 3) and storage.FiltroParty then return false end
+    
+    -- NOVO: Filtro Isolado para os Escudos Vermelhos Reais do seu Servidor (IDs 2, 4, 12, 14)
+    if creature:isPlayer() and storage.FiltroRedShield then
+        local emblem = creature:getEmblem()
+        if emblem == 2 or emblem == 4 or emblem == 12 or emblem == 14 then 
+            return false 
+        end
+    end
+    
     if creature:isPlayer() and creature:getSkull() == 0 and storage.FiltroSkull then return false end
+    
     return true
 end
