@@ -9,25 +9,7 @@ if not storage.exivaPro.guildTarget then storage.exivaPro.guildTarget = "" end
 if not storage.exivaPro.mode then storage.exivaPro.mode = "none" end
 
 local config = storage.exivaPro
-local imgPath = "/bot/CUSTOM_PREMIUM/imagens/stylesense.png"
-
--- [FUNÇÕES AUXILIARES]
-local function getRainbowColor()
-    local speed = 5 
-    local tick = os.clock() * speed
-    local hue = tick % 6
-    local r, g, b
-    local i = math.floor(hue)
-    local f = hue - i
-    local q, t = 1 - f, f
-    if i == 0 then r, g, b = 1, t, 0
-    elseif i == 1 then r, g, b = q, 1, 0
-    elseif i == 2 then r, g, b = 0, 1, t
-    elseif i == 3 then r, g, b = 0, q, 1
-    elseif i == 4 then r, g, b = t, 0, 1
-    else r, g, b = 1, 0, q end
-    return string.format("#%02X%02X%02X", r*255, g*255, b*255)
-end
+local imgPath = "/bot/BRINQUE/imagens/stylesense.png"
 
 -- [SISTEMA DA SETA VISUAL]
 local widgetArrow = setupUI([[
@@ -55,7 +37,7 @@ local arrowPos = {
   ["south-west"] = {rotation=225, ml=-80, mt=80}, ["south-east"] = {rotation=135, ml=80, mt=80}
 }
 
-local function showExivaArrow(direction)
+function showExivaArrow(direction)
     local pos = arrowPos[direction]
     if not pos then return end
     widgetArrow:setRotation(pos.rotation)
@@ -66,6 +48,23 @@ local function showExivaArrow(direction)
     schedule(2500, function() widgetArrow:setVisible(false) end)
 end
 
+-- [FUNÇÕES AUXILIARES]
+local function getRainbowColor()
+    local speed = 5 
+    local tick = os.clock() * speed
+    local hue = tick % 6
+    local r, g, b
+    local i = math.floor(hue)
+    local f = hue - i
+    local q, t = 1 - f, f
+    if i == 0 then r, g, b = 1, t, 0
+    elseif i == 1 then r, g, b = q, 1, 0
+    elseif i == 2 then r, g, b = 0, 1, t
+    elseif i == 3 then r, g, b = 0, q, 1
+    elseif i == 4 then r, g, b = t, 0, 1
+    else r, g, b = 1, 0, q end
+    return string.format("#%02X%02X%02X", r*255, g*255, b*255)
+end
 -- [INTERFACE GRÁFICA]
 local exivaWindow = setupUI([[
 MainWindow
@@ -240,8 +239,12 @@ function updateExivaUI()
         local btn = g_ui.createWidget('Button', exivaWindow.rightPanel.listPanel)
         btn:setText(entry.name); btn:setHeight(18); btn:setFont("verdana-11px-rounded"); btn:setColor(btnColor)
         btn.onClick = function() 
-            if currentTab == "team" then config.guildTarget = entry.name
-            else config.customTarget = entry.name; exivaWindow.leftPanel.manualName:setText(entry.name) end
+            if currentTab == "team" then 
+                config.guildTarget = entry.name
+            else 
+                config.customTarget = entry.name
+                exivaWindow.leftPanel.manualName:setText(entry.name) 
+            end
             updateExivaUI() 
         end
     end
@@ -255,11 +258,10 @@ function updateExivaUI()
     exivaWindow.leftPanel.hotkeyStatus:setColor(config.mode == "target" and "#FF0000" or "#555555")
     exivaWindow.leftPanel.hotkeyGuild:setColor(config.mode == "guild" and "#90EE90" or "#555555")
 end
-
 -- [CONTROLES E EVENTOS]
-onTextMessage(function(m, t)
-    if m ~= 20 then return end
-    local d = t:match("is to the ([a-z-]+)%.") or t:match("is .- to the ([a-z-]+)%.")
+onTextMessage(function(mode, text)
+    if not text then return end
+    local d = text:match("is to the ([a-z-]+)%.") or text:match("is .- to the ([a-z-]+)%.")
     if d then showExivaArrow(d) end
 end)
 
@@ -272,10 +274,11 @@ end)
 
 -- [MACRO PRINCIPAL: AUTO-EXIVA INTELIGENTE]
 macro(2000, function()
-    if config.mode == "none" then return end
+    local player = g_game.getLocalPlayer()
+    if not player or config.mode == "none" then return end
     
     local targetName = (config.mode == "target") and config.customTarget or config.guildTarget
-    if not targetName or targetName == "" or targetName == "Nenhum" then return end
+    if not targetName or targetName == "" or targetName:lower() == "nenhum" then return end
 
     local attacking = g_game.getAttackingCreature()
     
@@ -288,8 +291,12 @@ macro(2000, function()
     if config.mode == "guild" then
         for _, spec in ipairs(getSpectators()) do
             if spec:getName():lower() == targetName:lower() then
-                local dist = getDistanceBetween(player:getPosition(), spec:getPosition())
-                if dist <= 7 then return end 
+                local pPos = player:getPosition()
+                local sPos = spec:getPosition()
+                if pPos and sPos then
+                    local dist = getDistanceBetween(pPos, sPos)
+                    if dist <= 7 then return end 
+                end
             end
         end
     end
@@ -297,17 +304,19 @@ macro(2000, function()
     g_game.talk('exiva "' .. targetName .. '"')
 end)
 
--- [MACRO DE SCAN E FILTRO DE TEMPO CORRIGIDO]
+-- [MACRO DE SCAN E FILTRO DE TEMPO]
 macro(1000, function()
+    local player = g_game.getLocalPlayer()
+    if not player then return end
+
     local now = os.time()
     local changed = false
     local attacking = g_game.getAttackingCreature()
 
-    -- 1. Limpeza Segura (Trava de erro para nomes sem 'time')
+    -- 1. Limpeza Segura
     local function cleanList(list)
         for i = #list, 1, -1 do
-            -- Se não tiver o campo time ou se o tempo passou de 10 min
-            if not list[i].time or (now - list[i].time > 600) then 
+            if not list[i] or not list[i].time or (now - list[i].time > 600) then 
                 table.remove(list, i)
                 changed = true
             end
@@ -319,9 +328,15 @@ macro(1000, function()
 
     -- 2. Scan de Spectators
     for _, spec in ipairs(getSpectators()) do
-        if spec:isPlayer() and spec ~= player then
+        if spec:isPlayer() and spec:getName() ~= player:getName() then
             local name = spec:getName()
-            local isAlly = spec:isPartyMember() or (spec:getShield() >= 1 and spec:getShield() <= 3) or (player:getEmblem() > 0 and spec:getEmblem() == player:getEmblem())
+            
+            local isAlly = spec:isPartyMember() or (spec:getShield() >= 1 and spec:getShield() <= 3)
+            pcall(function()
+                if player:getEmblem() > 0 and spec:getEmblem() == player:getEmblem() then
+                    isAlly = true
+                end
+            end)
             
             if isAlly then
                 local found = false
