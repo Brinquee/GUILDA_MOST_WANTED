@@ -1,21 +1,21 @@
-setDefaultTab("GUILD") -- Garante que os créditos apareçam na aba HP do Healer
+setDefaultTab("GUILD")
 
-local targetPanelName = "targetShieldsConfigV2" -- Reset de cache para corrigir as IDs invertidas
+local targetPanelName = "targetShieldsConfigV2"
 
--- Inicializa o armazenamento das configurações (Limpo e corrigido)
+-- Inicializa o armazenamento das configuracoes
 if type(storage[targetPanelName]) ~= "table" then
   storage[targetPanelName] = {
-    attackBlue = true,    -- Caixinha Escudo Azul
-    attackGreen = false,  -- Caixinha Escudo Verde
-    attackRed = false,    -- Caixinha Escudo Vermelho
-    attackNone = false,   -- Caixinha Sem Escudo
+    attackBlue = true,
+    attackGreen = false,
+    attackRed = false,
+    attackNone = false,
     range = 7
   }
 end
 
 local tConfig = storage[targetPanelName]
 
--- ESTRUTURA VISUAL
+-- ESTRUTURA VISUAL DA JANELA SEGURO
 g_ui.loadUIFromString([[
 TargetHpRow < FlatPanel
   height: 25
@@ -35,7 +35,7 @@ TargetHpRow < FlatPanel
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 6
-    font: sans-bold-11
+    font: verdana-11px-rounded
 
 TargetSetupWindow < MainWindow
   !text: tr('Targeting HP Config')
@@ -50,7 +50,7 @@ TargetSetupWindow < MainWindow
     anchors.left: parent.left
     margin-top: 5
     width: 140
-    font: sans-bold-12
+    font: verdana-11px-rounded
 
   TextEdit
     id: rangeEdit
@@ -66,7 +66,7 @@ TargetSetupWindow < MainWindow
     anchors.top: rangeLabel.bottom
     anchors.left: parent.left
     margin-top: 12
-    font: sans-bold-12
+    font: verdana-11px-rounded
 
   ScrollablePanel
     id: modeList
@@ -94,7 +94,7 @@ TargetSetupWindow < MainWindow
     width: 90
 ]])
 
--- Cria o botão principal do Macro no BotPanel
+-- Cria o botao principal do Macro no BotPanel de forma segura
 UI.Separator()
 local targetUi = setupUI([[
 Panel
@@ -116,7 +116,7 @@ Panel
     margin-left: 3
     height: 17
     text: Setup
-]])
+]], getTab("GUILD"))
 
 local targetSetupWindow = nil
 
@@ -160,30 +160,31 @@ targetUi.edit.onClick = function()
   end
 end
 
--- LÓGICA DO MACRO COM AS ID'S TÉCNICAS REAIS DO TIBIA CORRIGIDAS
+-- LOGICA DO MACRO COM AS ID'S TECNICAS REAIS DO TIBIA
 local attackHpMacro = macro(200, function(macroObj)
     if isInPz() or g_game.isAttacking() then return end
 
     local localPlayer = g_game.getLocalPlayer()
-    local espectadores = g_map.getSpectators(localPlayer:getPosition(), false)
+    if not localPlayer then return end
     
+    local espectadores = g_map.getSpectators(localPlayer:getPosition(), false)
     local alvoEscolhido = nil
     local menorHpEncontrado = 101 
 
     for _, v in pairs(espectadores) do  
-        if v:isPlayer() and v ~= localPlayer and getDistanceBetween(pos(), v:getPosition()) <= tConfig.range then
+        if v:isPlayer() and v ~= localPlayer and getDistanceBetween(localPlayer:getPosition(), v:getPosition()) <= tConfig.range then
             local alvoEmblem = v:getEmblem()
             local podeAtacar = false
 
-            -- CHECAGEM SINCRO: Vincula os IDs reais do jogo às caixinhas certas do painel
+            -- Vincula os IDs reais do jogo as caixinhas certas do painel
             if (alvoEmblem == 3 or alvoEmblem == 13) and tConfig.attackBlue then
-                podeAtacar = true -- ID 3/13 é o Escudo Azul real do jogo
+                podeAtacar = true 
             elseif (alvoEmblem == 1 or alvoEmblem == 11) and tConfig.attackGreen then
-                podeAtacar = true -- ID 1/11 é o Escudo Verde real do jogo
+                podeAtacar = true 
             elseif (alvoEmblem == 2 or alvoEmblem == 4 or alvoEmblem == 12 or alvoEmblem == 14) and tConfig.attackRed then
-                podeAtacar = true -- ID 2/4 é o Escudo Vermelho real do jogo
+                podeAtacar = true 
             elseif alvoEmblem == 0 and tConfig.attackNone then
-                podeAtacar = true -- ID 0 é quem está Sem Escudo
+                podeAtacar = true 
             end
 
             if podeAtacar then
@@ -201,7 +202,10 @@ local attackHpMacro = macro(200, function(macroObj)
     end
 end)
 
-targetUi.title:setOn(attackHpMacro:isOn())
+-- CORREÇÃO: Força o macro a sempre iniciar DESLIGADO (setOff) ao abrir ou dar reload
+attackHpMacro.setOff()
+targetUi.title:setOn(false)
+
 targetUi.title.onClick = function(widget)
   attackHpMacro:toggle()
   widget:setOn(attackHpMacro:isOn())
