@@ -31,7 +31,7 @@ local BANCO_DADOS_CLIENTES = {
     
     -- Exemplo de Patrocinador também ilimitado
     ["CELESTIAL-HWID-4049913"] = {
-        nome = "Patrocinador Oficial",
+        nome = "Notbook",
         compra = "01/08/2026",
         vence = "ilimitado"
     },
