@@ -1,6 +1,6 @@
-setDefaultTab("main")
+setDefaultTab("GUILD")
 
-local panelName = "travaMostWanted"
+local panelName = "painelBrinqueScripts"
 if type(storage[panelName]) ~= "table" then
     storage[panelName] = {
         height = 140,
@@ -15,173 +15,423 @@ end
 
 local config = storage[panelName]
 
--- CONFIGURAÇÕES DE PROTEÇÃO REMOTA DA GUILDA
-local CHAR_VALIDADOR = "Gerente Most"
-local COMANDO_LOG     = "!sincronizar"
-local CHAVE_ASSINATURA_INTERNA = "MOST_WANTED_SECRET_KEY_2026"
+-- =============================================================================
+-- [BLOCO 1] BANCO DE DADOS E CONFIGURAÇÕES - BRINQUE SCRIPTS
+-- =============================================================================
+local LINK_RENOVACAO = "https://wa.me/qr/QHQWPAJNPYRDJ1" -- Seu link de atendimento
+
+-- CADASTRO DE CLIENTES COM SUPORTE A ACESSO ILIMITADO
+local BANCO_DADOS_CLIENTES = {
+    -- Seu computador configurado como permanente (Nunca vence e nao precisa de data)
+    ["CELESTIAL-HWID-37646993"] = {
+        nome = "Dono Brinque Scripts",
+        compra = "01/08/2026",
+        vence = "ilimitado"
+    },
+    
+    -- Exemplo de Patrocinador também ilimitado
+    ["CELESTIAL-HWID-11111111"] = {
+        nome = "Patrocinador Oficial",
+        compra = "01/08/2026",
+        vence = "ilimitado"
+    },
+    
+    -- Exemplo de Cliente Normal (O bot vai calcular os dias restantes automaticamente)
+    ["CELESTIAL-HWID-22222222"] = {
+        nome = "Cliente Exemplo 1",
+        compra = "01/08/2026",
+        vence = "15/08/2026"
+    }
+}
+
+-- LINKS REAIS DAS SUAS REDES SOCIAIS
+local LINK_INSTAGRAM = "https://www.instagram.com/brinquescriptsgamer?igsh=dXhhN2MxNWhxMm9m"
+local LINK_WHATSAPP  = "https://chat.whatsapp.com/D4WHVuAy41t6uQ6QZ3ibtR"
+local LINK_DISCORD   = "https://discord.gg/BRNzJ7cZjq"
+local LINK_YOUTUBE   = "https://youtube.com"
 
 local script_path = "/scripts_storage/"
-local path_licenca_json = script_path .. player:getName() .. '_lic.json'
-
-if not modules._G.g_resources.fileExists(script_path) then
-    modules._G.g_resources.makeDir(script_path)
-end
-
--- Assinatura digital que amarra a licença ao Nome do Personagem (Anti-Vazamento)
-local function gerarAssinaturaDigital(dadosTexto)
-    local hash = 0
-    local stringCombinada = dadosTexto .. player:getName() .. CHAVE_ASSINATURA_INTERNA
-    for i = 1, #stringCombinada do
-        hash = (hash * 31 + string.byte(stringCombinada, i)) % 100000000
-    end
-    return tostring(hash)
-end
-
--- Criptografia Hexadecimal para ocultar os dados no Bloco de Notas
-local function embaralharTexto(dadosLimpos)
-    local resultado = ""
-    for i = 1, #dadosLimpos do
-        resultado = resultado .. string.format("%02x", string.byte(dadosLimpos, i) + 5)
-    end
-    return resultado
-end
-
-local function desembaralharTexto(dadosEscondidos)
-    if not dadosEscondidos or #dadosEscondidos % 2 ~= 0 then return "{}" end
-    local resultado = ""
-    for i = 1, #dadosEscondidos, 2 do
-        local c = tonumber(dadosEscondidos:sub(i, i+1), 16)
-        if c then resultado = resultado .. string.char(c - 5) end
-    end
-    return resultado
-end
+-- =============================================================================
+-- [BLOCO 2 - METADE A] INTERFACES GRAFICAS DE LICENCA E BLOQUEIO
+-- =============================================================================
 local widgetRaizDoJogo = g_ui.getRootWidget()
 
--- JANELA 1: STATUS DA LICENÇA
-local setupTravaWindow = setupUI([[
-MainWindow
-  id: janelaLicenca
-  !text: tr('Status da Licenca - Most Wanted')
-  size: 350 200
-  @onEscape: self:hide()
+-- JANELA A: AVISO DE LICENÇA (PARA CLIENTES ATIVOS)
+local designAvisoLicencaOTUI = "MainWindow\n" ..
+"  id: janelaAvisoLicenca\n" ..
+"  !text: tr('Painel de Acesso - Brinque Scripts')\n" ..
+"  size: 320 200\n" ..
+"  @onEscape: self:hide()\n" ..
+"  background-color: alpha\n" ..
+"  image-border: 0\n" ..
+"  border: 0 alpha\n" ..
+"  padding: 0\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoAviso\n" ..
+"    image-source: /bot/BRINQUE/imagens/minimalistum.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.fill: parent\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  Panel\n" ..
+"    background-color: #000000B0\n" ..
+"    anchors.fill: parent\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblNomeCliente\n" ..
+"    text: Cliente: Carregando...\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    anchors.top: parent.top\n" ..
+"    anchors.left: parent.left\n" ..
+"    margin-top: 15\n" ..
+"    margin-left: 20\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblDiasRestantes\n" ..
+"    text: Status do Acesso: Calculando...\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    anchors.top: lblNomeCliente.bottom\n" ..
+"    anchors.left: parent.left\n" ..
+"    margin-top: 12\n" ..
+"    margin-left: 20\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoBtnRenovar\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: lblDiasRestantes.bottom\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: -50\n" ..
+"    margin-left: 30\n" ..
+"    margin-right: 30\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
+"    id: btnRenovar\n" ..
+"    text: Renovar / Prolongar Dias\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -23\n" ..
+"    phantom: false\n" ..
+"    anchors.fill: imgFundoBtnRenovar\n" ..
+"\n" ..
+"  Button\n" ..
+"    id: closeBtn\n" ..
+"    text: Fechar\n" ..
+"    font: cipsoftFont\n" ..
+"    anchors.bottom: parent.bottom\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-left: 20\n" ..
+"    margin-right: 20\n" ..
+"    margin-bottom: 8\n" ..
+"    height: 18\n"
 
-  Label
-    id: lblStatus
-    anchors.top: parent.top
-    anchors.left: parent.left
-    margin-top: 12
-    margin-left: 12
-    text: Status: Carregando...
-    font: verdana-11px-rounded
+-- JANELA B: NOVA TELA DE BLOQUEIO PARA MAQUINAS NAO REGISTRADAS
+local designBloqueioHWIDOTUI = "MainWindow\n" ..
+"  id: janelaBloqueioHWID\n" ..
+"  !text: tr('Acesso Negado - Brinque Scripts')\n" ..
+"  size: 340 230\n" ..
+"  @onEscape: self:hide()\n" ..
+"  background-color: alpha\n" ..
+"  image-border: 0\n" ..
+"  border: 0 alpha\n" ..
+"  padding: 0\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoBloqueio\n" ..
+"    image-source: /bot/BRINQUE/imagens/minimalistum.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.fill: parent\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  Panel\n" ..
+"    background-color: #000000C0\n" ..
+"    anchors.fill: parent\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblMsgBloqueio\n" ..
+"    text: Seu computador nao esta registrado!\\nEnvie o codigo abaixo para o Administrador.\\nPara liberar o seu acesso de forma imediata.\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ff4444\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    anchors.top: parent.top\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 15\n" ..
+"    margin-left: 10\n" ..
+"    margin-right: 10\n" ..
+"    height: 50\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblCodigoPC\n" ..
+"    text: ID DO PC: ...\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #FFD700\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    anchors.top: lblMsgBloqueio.bottom\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 15\n" ..
+"    height: 16\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoBtnSuporte\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: lblCodigoPC.bottom\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 20\n" ..
+"    margin-left: 40\n" ..
+"    margin-right: 40\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
+"    id: btnFalarAdmin\n" ..
+"    text: Enviar ID para o Suporte\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -23\n" ..
+"    phantom: false\n" ..
+"    anchors.fill: imgFundoBtnSuporte\n"
+-- JANELA C: PAINEL PRINCIPAL DE MACROS ORIGINAL
+local designPrincipalOTUI = "MainWindow\n" ..
+"  id: janelaEscolhaMacros\n" ..
+"  size: 560 380\n" ..
+"  @onEscape: self:hide()\n" ..
+"  background-color: alpha\n" ..
+"  image-border: 0\n" ..
+"  border: 0 alpha\n" ..
+"  padding: 0\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoCustomCelestiais\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/M_custompremium.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    image-repeated: false\n" ..
+"    anchors.fill: parent\n" ..
+"    margin: -5\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  Panel\n" ..
+"    background-color: #00000055\n" ..
+"    anchors.fill: parent\n" ..
+"    margin: -5\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  ScrollablePanel\n" ..
+"    id: listaScroll\n" ..
+"    anchors.top: parent.top\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: barraRolagem.left\n" ..
+"    anchors.bottom: sepInf.top\n" ..
+"    margin-top: 10\n" ..
+"    margin-left: 10\n" ..
+"    margin-right: 2\n" ..
+"    margin-bottom: 5\n" ..
+"    vertical-scrollbar: barraRolagem\n" ..
+"    layout:\n" ..
+"      type: verticalBox\n" ..
+"      spacing: 6\n" ..
+"\n" ..
+"  VerticalScrollBar\n" ..
+"    id: barraRolagem\n" ..
+"    anchors.top: parent.top\n" ..
+"    anchors.bottom: sepInf.top\n" ..
+"    anchors.right: lblRedesTitulo.left\n" ..
+"    margin-top: 10\n" ..
+"    margin-bottom: 5\n" ..
+"    margin-right: 5\n" ..
+"    step: 20\n" ..
+"    pixels-scroll: true\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblRedesTitulo\n" ..
+"    text: -- BRINQUE SCRIPTS --\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #FFD700\n" ..
+"    anchors.top: parent.top\n" ..
+"    anchors.left: parent.horizontalCenter\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 20\n" ..
+"    margin-left: 15\n" ..
+"    text-align: center\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoInsta\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: lblRedesTitulo.bottom\n" ..
+"    anchors.left: parent.horizontalCenter\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: -60\n" ..
+"    margin-left: 20\n" ..
+"    margin-right: 15\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
+"    id: btnInstagram\n" ..
+"    text: Acessar Instagram\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -23\n" ..
+"    phantom: false\n" ..
+"    anchors.fill: imgFundoInsta\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoWhats\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: imgFundoInsta.bottom\n" ..
+"    anchors.left: parent.horizontalCenter\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: -155\n" ..
+"    margin-left: 20\n" ..
+"    margin-right: 15\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
+"    id: btnWhatsApp\n" ..
+"    text: Grupo do WhatsApp\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -23\n" ..
+"    phantom: false\n" ..
+"    anchors.fill: imgFundoWhats\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoDiscord\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: imgFundoWhats.bottom\n" ..
+"    anchors.left: parent.horizontalCenter\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: -155\n" ..
+"    margin-left: 20\n" ..
+"    margin-right: 15\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
+"    id: btnDiscord\n" ..
+"    text: Servidor do Discord\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -23\n" ..
+"    phantom: false\n" ..
+"    anchors.fill: imgFundoDiscord\n" ..
+"\n" ..
+"  UIWidget\n" ..
+"    id: imgFundoYoutube\n" ..
+"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
+"    image-smooth: true\n" ..
+"    image-fixed-ratio: false\n" ..
+"    anchors.top: imgFundoDiscord.bottom\n" ..
+"    anchors.left: parent.horizontalCenter\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: -155\n" ..
+"    margin-left: 20\n" ..
+"    margin-right: 15\n" ..
+"    height: 200\n" ..
+"    phantom: true\n" ..
+"  Label\n" ..
+"    id: btnYouTube\n" ..
+"    text: Canal do YouTube\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    text-auto-resize: false\n" ..
+"    text-align: center\n" ..
+"    margin-top: -23\n" ..
+"    phantom: false\n" ..
+"    anchors.fill: imgFundoYoutube\n" ..
+"\n" ..
+"  HorizontalSeparator\n" ..
+"    id: sepInf\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    anchors.bottom: closeBtn.top\n" ..
+"    margin-bottom: 8\n" ..
+"\n" ..
+"  Button\n" ..
+"    id: closeBtn\n" ..
+"    text: Fechar\n" ..
+"    font: cipsoftFont\n" ..
+"    anchors.right: parent.right\n" ..
+"    anchors.bottom: parent.bottom\n" ..
+"    size: 60 20\n" ..
+"    margin-bottom: 5\n" ..
+"    margin-right: 15\n" ..
+"    @onClick: self:getParent():hide()\n"
 
-  Label
-    id: lblDataInicio
-    anchors.top: lblStatus.bottom
-    anchors.left: parent.left
-    margin-top: 10
-    margin-left: 12
-    text: Data da Sincronizacao: --/--/----
-    font: verdana-11px-rounded
-    color: #bdbdbd
+if widgetRaizDoJogo:recursiveGetChildById("janelaAvisoLicenca") then widgetRaizDoJogo:recursiveGetChildById("janelaAvisoLicenca"):destroy() end
+if widgetRaizDoJogo:recursiveGetChildById("janelaBloqueioHWID") then widgetRaizDoJogo:recursiveGetChildById("janelaBloqueioHWID"):destroy() end
+if widgetRaizDoJogo:recursiveGetChildById("janelaEscolhaMacros") then widgetRaizDoJogo:recursiveGetChildById("janelaEscolhaMacros"):destroy() end
 
-  Label
-    id: lblDataFinal
-    anchors.top: lblDataInicio.bottom
-    anchors.left: parent.left
-    margin-top: 10
-    margin-left: 12
-    text: Data de Expiracao: --/--/----
-    font: verdana-11px-rounded
-    color: #44ff44
+local setupAvisoWindow    = setupUI(designAvisoLicencaOTUI, widgetRaizDoJogo)
+local setupBloqueioWindow = setupUI(designBloqueioHWIDOTUI, widgetRaizDoJogo)
+local setupMacrosWindow   = setupUI(designPrincipalOTUI, widgetRaizDoJogo)
 
-  Label
-    id: lblTempoRestante
-    anchors.top: lblDataFinal.bottom
-    anchors.left: parent.left
-    margin-top: 10
-    margin-left: 12
-    text: Tempo Restante: Calculando...
-    font: verdana-11px-rounded
-    color: #e6bc22
-
-  HorizontalSeparator
-    id: sep
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: closeButton.top
-    margin-bottom: 8
-
-  Button
-    id: closeButton
-    !text: tr('Close')
-    font: cipsoftFont
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
-    size: 45 21
-    @onClick: self:getParent():hide()
-]], widgetRaizDoJogo)
-setupTravaWindow:hide()
-
--- JANELA 2: PAINEL DE MARCAÇÃO COM SCROLL INFINITO
-local setupMacrosWindow = setupUI([[
-MainWindow
-  id: janelaEscolhaMacros
-  !text: tr('Painel de Macros - Most Wanted')
-  size: 280 380
-  @onEscape: self:hide()
-
-  ScrollablePanel
-    id: listaScroll
-    anchors.top: parent.top
-    anchors.left: parent.left
-    anchors.right: barraRolagem.left
-    anchors.bottom: sepInf.top
-    margin-top: 10
-    margin-left: 10
-    margin-right: 2
-    margin-bottom: 5
-    vertical-scrollbar: barraRolagem
-    layout:
-      type: verticalBox
-      spacing: 6
-
-  VerticalScrollBar
-    id: barraRolagem
-    anchors.top: parent.top
-    anchors.bottom: sepInf.top
-    anchors.right: parent.right
-    margin-top: 10
-    margin-bottom: 5
-    margin-right: 10
-    step: 14
-    pixels-scroll: true
-
-  HorizontalSeparator
-    id: sepInf
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: closeBtn.top
-    margin-bottom: 8
-
-  Button
-    id: closeBtn
-    !text: tr('Close')
-    font: cipsoftFont
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
-    size: 60 20
-    margin-bottom: 5
-    margin-right: 10
-    @onClick: self:getParent():hide()
-]], widgetRaizDoJogo)
+setupAvisoWindow:hide()
+setupBloqueioWindow:hide()
 setupMacrosWindow:hide()
 
--- Painel Dinâmico da Aba Lateral
-local uiTravaAba = nil
-local function renderizarBotoesDaAbaLateral(licencaAtiva)
-    if uiTravaAba then uiTravaAba:destroy() end
+local pastaImg = "/bot/BRINQUE/imagens/"
+if not g_resources.fileExists(pastaImg .. "BOTAO.png") then
+    setupMacrosWindow.imgFundoInsta:setImageSource("")
+    setupMacrosWindow.imgFundoWhats:setImageSource("")
+    setupMacrosWindow.imgFundoDiscord:setImageSource("")
+    setupMacrosWindow.imgFundoYoutube:setImageSource("")
+    setupAvisoWindow.imgFundoBtnRenovar:setImageSource("")
+    setupBloqueioWindow.imgFundoBtnSuporte:setImageSource("")
+end
+-- =============================================================================
+-- [BLOCO 3] MOTOR DE DATA, HWID E VALIDAÇÃO SUPREMA - BRINQUE SCRIPTS
+-- =============================================================================
+local function abrirLinkNoNavegadorReal(urlDestino)
+    if g_signals and g_signals.openUrl then g_signals.openUrl(urlDestino)
+    elseif g_platform and g_platform.openUrl then g_platform.openUrl(urlDestino)
+    else print(">>> [BRINQUE] Link para copiar: " .. urlDestino) end
+end
 
-    if licencaAtiva then
+setupMacrosWindow.btnInstagram.onClick = function() abrirLinkNoNavegadorReal(LINK_INSTAGRAM) end
+setupMacrosWindow.btnWhatsApp.onClick  = function() abrirLinkNoNavegadorReal(LINK_WHATSAPP) end
+setupMacrosWindow.btnDiscord.onClick   = function() abrirLinkNoNavegadorReal(LINK_DISCORD) end
+setupMacrosWindow.btnYouTube.onClick   = function() abrirLinkNoNavegadorReal(LINK_YOUTUBE) end
+
+setupAvisoWindow.btnRenovar.onClick = function() abrirLinkNoNavegadorReal(LINK_RENOVACAO) end
+setupAvisoWindow.closeBtn.onClick   = function() setupAvisoWindow:hide() end
+
+setupBloqueioWindow.btnFalarAdmin.onClick = function() abrirLinkNoNavegadorReal(LINK_RENOVACAO) end
+
+local uiTravaAba = nil
+local function renderizarBotaoMenuLateral(maquinaValida, mensagemStatus, corStatus)
+    if uiTravaAba then uiTravaAba:destroy() end
+    if maquinaValida then
         uiTravaAba = setupUI([[
 Panel
   height: 40
@@ -203,136 +453,187 @@ Panel
     height: 17
     text: Escolher Macros
     font: verdana-11px-rounded
-  ]], getTab("main"))
+  ]], getTab("GUILD"))
 
         uiTravaAba.btnChecar.onClick = function()
-            if setupTravaWindow:isVisible() then setupTravaWindow:hide() else setupTravaWindow:show() setupTravaWindow:raise() setupTravaWindow:focus() atualizarTextosDoPainel() end
+            if setupAvisoWindow:isVisible() then setupAvisoWindow:hide() else setupAvisoWindow:show() setupAvisoWindow:raise() setupAvisoWindow:focus() end
         end
         uiTravaAba.btnMacrosMenu.onClick = function()
             if setupMacrosWindow:isVisible() then setupMacrosWindow:hide() else setupMacrosWindow:show() setupMacrosWindow:raise() setupMacrosWindow:focus() end
         end
     else
-        uiTravaAba = setupUI([[
+        uiTravaAba = setupUI(string.format([[
 Panel
   height: 20
-  Button
-    id: btnChecar
+  Label
+    id: lblAvisoBloqueio
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 17
-    text: Ver Status da Licenca
+    text-align: center
+    text: %%s
     font: verdana-11px-rounded
-  ]], getTab("main"))
-
-        uiTravaAba.btnChecar.onClick = function()
-            if setupTravaWindow:isVisible() then setupTravaWindow:hide() else setupTravaWindow:show() setupTravaWindow:raise() setupTravaWindow:focus() atualizarTextosDoPainel() end
-        end
+    color: %%s
+  ]], mensagemStatus, corStatus), getTab("GUILD"))
         setupMacrosWindow:hide()
     end
 end
+
 local MAPA_MACROS_GUILDA = {
-
-											-- MACROS COM PRIORIDADE --
-
-    { nome = "HEALING BRQ",      key = "healingBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/healingBRQ.lua" },
-	
-    { nome = "OPEN BAG MAIN BRQ",key = "openbagmainBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagmainBRQ.lua" },
-	
-	{ nome = "BLESSED HP/MP BRQ",key = "blessedhpmpBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/blessed_hpmpBRQ.lua" },
-	
-    { nome = "ENEGY-SSA-MIGHT BRQ",       key = "energyssamightBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/enegy_ssa_mightBRQ.lua" },
-	
-    { nome = "POT GUILD BRQ",        key = "potguildBRQ",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/potguildBRQ.lua" },
-	
-	{ nome = "BUFF BRQ",    key = "BRQbuff",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/BRQ_buff_v1.0.lua" },
-	
-	{ nome = "PUXAR AO REDOR BRQ",        key = "puxaraoredorBRQ",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/puxaraoredorBRQ.lua" },
-	
-	{ nome = "FILTRO BATTLE BRQ",    key = "filtrobatleBRQ",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/filtrobatleBRQ.lua" },
-											-- MACROS SEM PRIORIDADE --
-
-	
+    -- ==========================================
+    -- MACROS COM PRIORIDADE (HEALING)
+    -- ==========================================
+    { nome = "HEALING BRQ",          key = "healingBRQ",         cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/healingBRQ.lua" },
+    { nome = "OPEN BAG MAIN BRQ",    key = "openbagmainBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagmainBRQ.lua" },
+    { nome = "BLESSED HP/MP BRQ",    key = "blessedhpmpBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/blessed_hpmpBRQ.lua" },
+    { nome = "ENEGY-SSA-MIGHT BRQ",  key = "energyssamightBRQ",  cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/enegy_ssa_mightBRQ.lua" },
+	{ nome = "Painel",    key = "painel",     cat = "EXTRAS",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Painel.lua" },
+    { nome = "POT GUILD BRQ",        key = "potguildBRQ",        cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/potguildBRQ.lua" },
+    { nome = "BUFF BRQ",             key = "BRQbuff",            cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/BRQ_buff_v1.0.lua" },
+	{ nome = "STAMINA BRQ",          key = "staminaBRQ",         cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/staminaBRQ.lua" },
 
 
-    { nome = "SKILLS BRQ",           key = "skillsBRQ",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/skillsBRQ.lua" },
-	
-    { nome = "RAINBOW COLOR BRQ",    key = "rainbowcolorBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/rainbowcolorBRQ.lua" },
-	
-    { nome = "COMBO LIDER BRQ",      key = "comboliderBRQ",        url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/comboliderBRQ.lua" },
-	
-											-- MACROS DA AUTOMATICO GUILDA --
-	{ nome = "3 PUSHE BRQ",             key = "3pusheBRQ",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/3pusheBRQ.lua" },
-												
-    { nome = "STAMINA BRQ",          key = "staminaBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/staminaBRQ.lua" },
-	
-    { nome = "EXIVA BRQ",            key = "exivaBRQ",        url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exivaBRQ.lua" },
-	
-    { nome = "MAGIAS S/PK BRQ",    key = "magiasempkBRQ",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/magiasempkBRQ.lua" },
-	
-    { nome = "FPS BRQ",              key = "fpsBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fpsBRQ.lua" },
-	
-	{ nome = "OUTFIT VISUAL BRQ",   key = "outfitvisualBRQ",      url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/outfitvisualBRQ.lua" },
-	
-    { nome = "ANTPUSHE MOUSE-PE BRQ",              key = "antpushemousepeBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Dropar_item_na_posicao_do_mouseBRQ.lua" },
-	
-    { nome = "MW NO PE",              key = "MWPE",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/mwnopeBRQ.lua" },
-	
-	{ nome = "TARGET PLAY OFF",              key = "targetplayoffBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/targetplayoffBRQ.lua" },
-	
-	{ nome = "FUGA COMPLETA BRQ",              key = "fugacompletaBRQ",          url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fugacompletaBRQ.lua" },
-	
-	{ nome = "OPEN BAG CHEIA BRQ",key = "openbagcheiaBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" },
+    -- ==========================================
+    -- MACROS SEM PRIORIDADE (CAVE/TARGET)
+    -- ==========================================
+    { nome = "FUGA COMPLETA BRQ",    key = "fugacompletaBRQ",    cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fugacompletaBRQ.lua" },
+    { nome = "OLHEIRO_BRQ",          key = "olheiroBRQ",         cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/olheiro_BRQ1.0.lua" },
+    { nome = "COMBO LIDER BRQ",      key = "comboliderBRQ",      cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/comboliderBRQ.lua" },
+    { nome = "OUTFIT VISUAL BRQ",    key = "outfitvisualBRQ",    cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/outfitvisualBRQ.lua" },
+    { nome = "TARGET PLAY OFF",      key = "targetplayoffBRQ",   cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/targetplayoffBRQ.lua" },
+    -- ==========================================
+    -- MACROS DA AUTOMATICO GUILDA (WAR)
+    -- ==========================================
+    { nome = "3 PUSHE BRQ",          key = "3pusheBRQ",          cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/3pusheBRQ.lua" },
+    { nome = "ANTPUSHE MOUSE-PE BRQ", key = "antpushemousepeBRQ", cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Dropar_item_na_posicao_do_mouseBRQ.lua" },
+    { nome = "MW NO PE",             key = "MWPE",               cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/mwnopeBRQ.lua" },
+    { nome = "PUXAR AO REDOR BRQ",   key = "puxaraoredorBRQ",    cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/puxaraoredorBRQ.lua" },
+    { nome = "EXIVA BRQ",            key = "exivaBRQ",           cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exivaBRQ.lua" },
 
-	{ nome = "HUND COLOR BRQ",key = "hundcolorBRQ",    url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/hundcolorBRQ.lua" }
-
+    -- ==========================================
+    -- MACROS EXTRAS (EXTRAS)
+    -- ==========================================
+	{ nome = "FILTRO BATTLE BRQ",    key = "filtrobatleBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/filtrobatleBRQ" },
+	{ nome = "SKILLS BRQ",           key = "skillsBRQ",          cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/skillsBRQ.lua" },
+    { nome = "FPS BRQ",              key = "fpsBRQ",             cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fpsBRQ.lua" },
+    { nome = "RAINBOW COLOR BRQ",    key = "rainbowcolorBRQ",    cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/rainbowcolorBRQ.lua" },
+    { nome = "HUND COLOR BRQ",       key = "hundcolorBRQ",       cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/hundcolorBRQ.lua" },
+    { nome = "OPEN BAG CHEIA BRQ",   key = "openbagcheiaBRQ",    cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" },
+	{ nome = "MAGIAS S/PK BRQ",      key = "magiasempkBRQ",      cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/magiasempkBRQ.lua" }
 }
 
--- Desenha as caixas cinzas no painel
-for _, item in ipairs(MAPA_MACROS_GUILDA) do
-    if config.macrosMarcados[item.key] == nil then config.macrosMarcados[item.key] = true end
-    local box = g_ui.createWidget("CheckBox", setupMacrosWindow.listaScroll)
-    box:setText(item.nome)
-    box:setFont("verdana-11px-rounded")
-    box:setHeight(16)
-    box:setChecked(config.macrosMarcados[item.key] == true)
-    box.onClick = function(w)
-        local val = not w:isChecked()
-        w:setChecked(val)
-        config.macrosMarcados[item.key] = val
-        print("[Trava] Preferenca alterada para " .. item.nome .. ": " .. (val and "LIGADO" or "DESLIGADO"))
-    end
+local function converterDataParaTimestamp(dataTexto)
+    local dia, mes, ano = dataTexto:match("(%d+)/(%d+)/(%d+)")
+    if dia and mes and ano then return os.time({year = tonumber(ano), month = tonumber(mes), day = tonumber(dia), hour = 23, min = 59, sec = 59}) end
+    return nil
 end
 
--- VARIÁVEL DE BLINDAGEM CONTRA DOWNLOAD DUPLO
-local loteJaEstaSendoBaixado = false
+local pastaEscritaParaValidar = tostring(g_resources.getWriteDir()):lower():trim()
+local hashCalculadoLocal = 0
+for i = 1, #pastaEscritaParaValidar do hashCalculadoLocal = (hashCalculadoLocal * 31 + string.byte(pastaEscritaParaValidar, i)) % 100000000 end
+local hwidDaMaquinaDoCliente = "CELESTIAL-HWID-" .. tostring(hashCalculadoLocal)
 
-local function executarFilaCustomizadaHTTP(indice)
-    -- Tranca o motor no primeiro slot para não deixar outra requisição entrar em paralelo
-    if indice == 1 then
-        if loteJaEstaSendoBaixado then 
-            print("[Seguranca] Alerta: Uma fila de download ja esta ativa. Ignorando chamada duplicada.")
-            return 
+local computadorEstaAutorizado = false
+local stringAvisoAba = "PC NAO REGISTRADO"
+local corAvisoAba = "#ff4444"
+
+local dadosDestePC = BANCO_DADOS_CLIENTES[hwidDaMaquinaDoCliente]
+
+if dadosDestePC then
+    setupAvisoWindow.lblNomeCliente:setText("Cliente: " .. dadosDestePC.nome)
+    
+    if dadosDestePC.vence == "ilimitado" then
+        computadorEstaAutorizado = true
+        setupAvisoWindow.lblDiasRestantes:setText("Status do Acesso: Permanente")
+        setupAvisoWindow.lblDiasRestantes:setColor("#00bfff")
+        print("[BRINQUE SCRIPTS] Bem-vindo! Acesso ilimitado verificado com sucesso.")
+    else
+        local timestampVencimento = converterDataParaTimestamp(dadosDestePC.vence)
+        if timestampVencimento then
+            local segundosRestantes = timestampVencimento - os.time()
+            local diasRestantes = math.ceil(segundosRestantes / 86400)
+            
+            if diasRestantes > 0 then
+                computadorEstaAutorizado = true
+                setupAvisoWindow.lblDiasRestantes:setText("Dias Restantes: " .. diasRestantes .. " dias")
+                
+                if diasRestantes <= 7 then
+                    setupAvisoWindow.lblDiasRestantes:setColor("#ff4444")
+                else
+                    setupAvisoWindow.lblDiasRestantes:setColor("#44ff44")
+                end
+                setupAvisoWindow:show()
+            else
+                stringAvisoAba = "ACESSO EXPIRADO"
+                setupAvisoWindow.lblDiasRestantes:setText("Acesso Expirado! Bloqueado.")
+                setupAvisoWindow.lblDiasRestantes:setColor("#ff4444")
+                setupAvisoWindow.closeBtn:hide()
+                setupAvisoWindow:show()
+                MAPA_MACROS_GUILDA = {}
+            end
         end
-        loteJaEstaSendoBaixado = true
     end
+else
+    setupBloqueioWindow.lblCodigoPC:setText("ID DO PC: " .. hwidDaMaquinaDoCliente)
+    setupBloqueioWindow:show()
+    print("=========================================================================")
+    print(">>> [BRINQUE SCRIPTS] ACESSO BLOQUEADO! Computador nao registrado.")
+    print(">>> Forneça este ID para o Admin registrar sua maquina: " .. hwidDaMaquinaDoCliente)
+    print("=========================================================================")
+    MAPA_MACROS_GUILDA = {}
+end
 
+local ORDEM_CATEGORIAS = { "HEALING", "CAVE/TARGET", "WAR", "EXTRAS" }
+local CORES_CATEGORIAS = { ["HEALING"] = "#44ff44", ["CAVE/TARGET"] = "#00bfff", ["WAR"] = "#ff4444", ["EXTRAS"] = "#e6bc22" }
+
+for _, nomeCat in ipairs(ORDEM_CATEGORIAS) do
+    local div = g_ui.createWidget("Label", setupMacrosWindow.listaScroll)
+    div:setText("-- " .. nomeCat .. " --")
+    div:setFont("verdana-11px-rounded")
+    div:setColor(CORES_CATEGORIAS[nomeCat])
+    div:setMarginTop(5)
+    div:setMarginBottom(2)
+
+    for _, item in ipairs(MAPA_MACROS_GUILDA) do
+        if item.cat == nomeCat then
+            if config.macrosMarcados[item.key] == nil then config.macrosMarcados[item.key] = true end
+            local box = g_ui.createWidget("CheckBox", setupMacrosWindow.listaScroll)
+            box:setText(item.nome)
+            box:setFont("verdana-11px-rounded")
+            box:setHeight(16)
+            box:setChecked(config.macrosMarcados[item.key] == true)
+            box.onClick = function(w)
+                local val = not w:isChecked()
+                w:setChecked(val)
+                config.macrosMarcados[item.key] = val
+            end
+        end
+    end
+end
+-- =============================================================================
+-- [BLOCO 4] EXECUTOR DE FILA HTTP E EVENTOS REMOTOS - BRINQUE SCRIPTS
+-- =============================================================================
+local loteJaEstaSendoBaixado = false
+local function executarFilaCustomizadaHTTP(indice)
+    if not computadorEstaAutorizado then return end
+    if indice == 1 then if loteJaEstaSendoBaixado then return end loteJaEstaSendoBaixado = true end
+    
     local macroAlvo = MAPA_MACROS_GUILDA[indice]
     if not macroAlvo then 
-        print("[Baixador] Todos os scripts marcados foram injetados com sucesso."); 
-        loteJaEstaSendoBaixado = false -- Destranca apenas ao finalizar tudo
+        print("[Brinque Scripts] Todos os macros ativos injetados via nuvem com sucesso.")
+        loteJaEstaSendoBaixado = false 
         return 
     end
     
     if config.macrosMarcados[macroAlvo.key] == true then
         HTTP.get(macroAlvo.url .. "?v=" .. os.time(), function(content, err)
             if not err then
-                if macroAlvo.url:find("PotGuild.lua") then
-                    if partyPotUI then partyPotUI:destroy() partyPotUI = nil end
-                    if ppWindow then ppWindow:destroy() ppWindow = nil end
+                if macroAlvo.url:find("PotGuild.lua") then 
+                    if partyPotUI then partyPotUI:destroy() partyPotUI = nil end 
+                    if ppWindow then ppWindow:destroy() ppWindow = nil end 
                 end
                 local script, syntaxErr = loadstring(content)
-                if script then pcall(script) else print("Erro slot: " .. tostring(syntaxErr)) end
+                if script then pcall(script) else print("[Erro Script] Slot falhou: " .. tostring(syntaxErr)) end
             end
             schedule(1000, function() executarFilaCustomizadaHTTP(indice + 1) end)
         end)
@@ -341,88 +642,28 @@ local function executarFilaCustomizadaHTTP(indice)
     end
 end
 
-local function atualizarTextosDoPainel()
-    if not setupTravaWindow:isVisible() then return end
-    if not modules._G.g_resources.fileExists(path_licenca_json) then return end
-    local txt = desembaralharTexto(modules._G.g_resources.readFileContents(path_licenca_json):trim())
-    local status, dados = pcall(json.decode, txt)
-    if status and dados and dados.expiracao then
-        local restante = dados.expiracao - os.time()
-        setupTravaWindow.lblDataInicio:setText("Data de Sincronizacao: " .. (dados.dataSinc or "--/--/----"))
-        setupTravaWindow.lblDataFinal:setText("Data de Expiracao: " .. os.date("%d/%m/%Y", dados.expiracao))
-        if restante > 0 then
-            setupTravaWindow.lblStatus:setText("Status: LICENCA ATIVA")
-            setupTravaWindow.lblStatus:setColor("#44ff44")
-            setupTravaWindow.lblTempoRestante:setText(string.format("Tempo Restante: %d dias e %d horas", math.floor(restante / 86400), math.floor((restante % 86400) / 3600)))
-        else
-            setupTravaWindow.lblStatus:setText("Status: EXPIRADO / TRAVADO")
-            setupTravaWindow.lblStatus:setColor("#ff4444")
-            setupTravaWindow.lblTempoRestante:setText("Tempo Restante: 0 dias (Bloqueado)")
-        end
-    end
-end
-
-local function checarLicencaValidaComStatus()
-    if not modules._G.g_resources.fileExists(path_licenca_json) then return false end
-    local txt = desembaralharTexto(modules._G.g_resources.readFileContents(path_licenca_json):trim())
-    local status, dados = pcall(json.decode, txt)
-    if status and dados and dados.expiracao and dados.assinatura then
-        local checagemTexto = tostring(dados.expiracao) .. tostring(dados.status) .. tostring(dados.dataSinc)
-        if dados.assinatura ~= gerarAssinaturaDigital(checagemTexto) then return false end
-        if dados.status == "bloqueado" or os.time() >= dados.expiracao then return false end
-        return true
-    end
-    return false
-end
-
-local function converterDataParaTimestamp(dataTexto)
-    local dia, mes, ano = dataTexto:match("(%d+)/(%d+)/(%d+)")
-    if dia and mes and ano then return os.time({year = tonumber(ano), month = tonumber(mes), day = tonumber(dia), hour = 23, min = 59, sec = 59}) end
-    return nil
-end
-
-local function salvarNovaLicencaCriptografada(timestampFinal, statusString)
-    local dataHoje = os.date("%d/%m/%Y %H:%M:%S")
-    local textoParaAssinar = tostring(timestampFinal) .. tostring(statusString) .. tostring(dataHoje)
-    local assinaturaValida = gerarAssinaturaDigital(textoParaAssinar)
-    local jsonString = json.encode({ expiracao = timestampFinal, status = statusString, dataSinc = dataHoje, signature = assinaturaValida, assinatura = assinaturaValida })
-    pcall(function() modules._G.g_resources.writeFileContents(path_licenca_json, embaralharTexto(jsonString)) end)
-end
-
--- Verificador em segundo plano
+-- MONITOR DE MAQUINA CÍCLICO (EXPULSA O CARA SE ELE BURLAR O ARQUIVO EM CACHE)
 macro(600000, function() 
-    local valido = checarLicencaValidaComStatus()
-    renderizarBotoesDaAbaLateral(valido)
-    if not valido then reload() end 
+    renderizarBotaoMenuLateral(computadorEstaAutorizado, stringAvisoAba, corAvisoAba)
+    if not computadorEstaAutorizado then 
+        print("[Seguranca] Maquina desautorizada ou expirada detectada. Forcando recarregamento...")
+        reload() 
+    end 
 end)
 
--- Interceptador de PM do Gerente Most
-onTalk(function(name, level, mode, text, channelId)
-    if name == CHAR_VALIDADOR and text:lower():trim():find("licenca acaba dia") then
-        local dataCaptured = text:match("(%d+/%d+/%d+)")
-        if dataCaptured then
-            local timestampFinal = converterDataParaTimestamp(dataCaptured)
-            if timestampFinal then
-                salvarNovaLicencaCriptografada(timestampFinal, "ativo")
-                print(">>> [SEGURANÇA] Sincronizacao remota atualizada em disco!")
-                renderizarBotoesDaAbaLateral(true)
-                -- Tenta rodar o download. Se o cache já iniciou, a trava da linha 48 barra a duplicada!
-                executarFilaCustomizadaHTTP(1)
-            end
-        end
-    end
+-- SISTEMA AUXILIAR DE TEXTO DO EXIVA NATIVO
+onTextMessage(function(m, t)
+    if m ~= 20 then return end
+    local d = t:match("is to the ([a-z-]+)%.") or t:match("is .- to the ([a-z-]+)%.")
+    if d then showExivaArrow(d) end
 end)
 
--- Manda a PM obrigatoriamente
-schedule(2000, function() sayPrivate(CHAR_VALIDADOR, COMANDO_LOG) end)
+-- GATILHO DE ARRANQUE INICIAL DO PROGRAMA
+renderizarBotaoMenuLateral(computadorEstaAutorizado, stringAvisoAba, corAvisoAba)
 
--- IGNIÇÃO DO SISTEMA
-local estaValidoNoArranque = checarLicencaValidaComStatus()
-renderizarBotoesDaAbaLateral(estaValidoNoArranque)
-
-if estaValidoNoArranque then
-    print("[Seguranca] Licenca ativa. Iniciando download automatico via cache...")
+if computadorEstaAutorizado then
+    print("[Brinque Scripts] Identidade confirmada. Carregando scripts em nuvem...")
     executarFilaCustomizadaHTTP(1)
 else
-    print(">>> [SEGURANÇA] Licenca expirada ou pendente. Aguardando comunicacao...")
+    print(">>> [BRINQUE SCRIPTS] Bloqueado. Aguardando registro ou renovacao deste PC...")
 end
