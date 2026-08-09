@@ -48,7 +48,7 @@ local configName = modules.game_bot.contentsPanel.config:getCurrentOption().text
 local pathBase = "/bot/" .. configName .. "/Imagens/"
 
 
-local imgFixa = pathBase .. "itachibinque" 
+local imgFixa = pathBase .. "custompremium" 
 
 -- Função para aplicar a imagem
 local function changeBotImage(path)
