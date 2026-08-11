@@ -1,3 +1,7 @@
+
+setDefaultTab("main")
+
+
 panel = mainTab;
 
 local bugMap = {};
