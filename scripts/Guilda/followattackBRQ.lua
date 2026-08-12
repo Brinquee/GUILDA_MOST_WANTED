@@ -115,8 +115,8 @@ popUpWindow:hide()
 setDefaultTab("GUILD")
 if not storage.FollowChaseSetup then storage.FollowChaseSetup = {} end
 if not storage.FollowChaseSetup.itemData then storage.FollowChaseSetup.itemData = 37610 end
-if not storage.FollowChaseSetup.posX then storage.FollowChaseSetup.posX = 1550 end
-if not storage.FollowChaseSetup.posY then storage.FollowChaseSetup.posY = 750 end
+if not storage.FollowChaseSetup.posX then storage.FollowChaseSetup.posX = 550 end
+if not storage.FollowChaseSetup.posY then storage.FollowChaseSetup.posY = 550 end
 if not storage.FollowChaseSetup.corLigado then storage.FollowChaseSetup.corLigado = "green" end
 if not storage.FollowChaseSetup.corDesligado then storage.FollowChaseSetup.corDesligado = "red" end
 
