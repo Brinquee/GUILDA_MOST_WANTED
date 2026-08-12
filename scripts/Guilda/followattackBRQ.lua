@@ -7,7 +7,7 @@ local widgetRaizDoJogo = g_ui.getRootWidget()
 -- Design do Painel Flutuante de Configuracao
 local designPrincipalOTUI = "MainWindow\n" ..
 "  id: janelaConfigChase\n" ..
-"  !text: tr('Configurar Follow Chase')\n" ..
+"  !text: tr('BRINQUE - FOLLOW ATTACK')\n" ..
 "  size: 260 295\n" ..
 "  @onEscape: self:hide()\n" ..
 "  Label\n" ..
@@ -201,7 +201,7 @@ Panel
     spacing: 4
   Button
     id: btnAbrePainel
-    text: Setup Chase
+    text: SETUP FOLLOW-ATTACK
     width: 174
 ]], painelDaAbaGUILD)
 
