@@ -1,4 +1,4 @@
-setDefaultTab("Main")
+setDefaultTab("Cave")
 
 local panelName = "exivaBrinquePremium"
 if type(storage[panelName]) ~= "table" then
@@ -33,9 +33,9 @@ local currentTab = "enemy"
 local timeoutPainelJanela = 0
 local delayExivaTimer = 0
 
-local painelDaAbaMain = getTab("Main")
-if painelDaAbaMain:recursiveGetChildById("panelBotoesExivaNativos") then
-    painelDaAbaMain:recursiveGetChildById("panelBotoesExivaNativos"):destroy()
+local painelDaAbaCave = getTab("Cave")
+if painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos") then
+    painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos"):destroy()
 end
 
 local botoesLateraisUI = setupUI([[
@@ -58,7 +58,7 @@ Panel
     text: Config Painel
     width: 85
     color: #00bfff
-]], painelDaAbaMain)
+]], painelDaAbaCave)
 
 local widgetRaizDoJogo = g_ui.getRootWidget()
 local designPrincipalOTUI = "MainWindow\n" ..
