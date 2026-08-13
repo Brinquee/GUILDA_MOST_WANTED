@@ -1,37 +1,4 @@
-UI.Separator()
-setDefaultTab("Tools") -- Garante que os créditos apareçam na aba HP do Healer
-
--- =============================================================================
--- [PAINEL DE CRÉDITOS E SUPORTE - BRINQUE SCRIPT NATIVO ANIMADO]
--- =============================================================================
-local currentVersion
-local available = false
-
-
--- 1. Rótulo Principal: Nome da Marca Destacado em Vermelho Original
-local labelBrinqueMarca = UI.Label("V-v  BRINQUE Tools  v-V")
-if labelBrinqueMarca then
-    labelBrinqueMarca:setColor("#ffff00") -- Cor Vermelho de Elite
-    labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
-end
-
-
-
--- =============================================================================
--- [MOTOR DE PISCAR SIMPLES] DEGRADE CONTÍNUO EM LOOP DE BACKGROUND (SEM CRASH)
--- =============================================================================
-macro(150, function()
-    if not labelBrinqueMarca then return end
-
-    -- Coleta o tempo atual em ondas matemáticas (Seno de frequência rápida)
-    local tempoOnda = os.clock() * 5
-    local pulsoIntensidade = math.abs(math.sin(tempoOnda))
-
-    -- 1. FAZ A LOGO "HEALING BRINQUE" PISCAR EM DEGRADÊ DE VERMELHO (VIVO <-> ESCURO)
-    local rLogo = math.floor(100 + (155 * pulsoIntensidade)) -- Oscila a intensidade do Vermelho
-    local corLogoHex = string.format("#%02X0000", rLogo)
-    labelBrinqueMarca:setColor(corLogoHex)
-end)
+setDefaultTab("Cave")
 
 local panelName = "exivaBrinquePremium"
 if type(storage[panelName]) ~= "table" then
@@ -68,14 +35,14 @@ local delayExivaTimer = 0
 local campoExivaEditandoVal = ""
 local campoExivaEditandoSubVal = nil
 
-local painelDaAbaCave = getTab("Tools")
-if painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos") then
-    painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos"):destroy()
+local painelDaAbaCave = getTab("Cave")
+if painelDaAbaCave:recursiveGetChildById("exivaHunterBrinque_panelBotoesExivaNativos") then
+    painelDaAbaCave:recursiveGetChildById("exivaHunterBrinque_panelBotoesExivaNativos"):destroy()
 end
 
 local botoesLateraisUI = setupUI([[
 Panel
-  id: panelBotoesExivaNativos
+  id: exivaHunterBrinque_panelBotoesExivaNativos
   height: 18
   margin-top: 5
   layout:
@@ -97,39 +64,39 @@ Panel
 
 local widgetRaizDoJogo = g_ui.getRootWidget()
 -- =============================================================================
--- [BLOCO 2] DESIGN DA MAINWINDOW MESTRE (CORRIGIDO ERRO DE CAST DO OTML)
+-- [BLOCO 2] DESIGN DA MAINWINDOW MESTRE E POP-UP SEGURO (IDS 100% ISOLADOS)
 -- =============================================================================
 local designPrincipalOTUI = [[
 MainWindow
-  id: janelaGeralExivaHunterMestre
+  id: exivaHunterBrinque_janelaGeralMestre
   size: 500 500
   background-color: #1a1a1aef
   @onEscape: self:hide()
 
   Label
-    id: titleBase
+    id: exivaHunterBrinque_titleBase
     text: PAINEL EXIVA - BRINQUE SCRIPTS
     font: verdana-11px-rounded
     color: #FFFFFF
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
-    margin-top: -25
+    margin-top: -19
     text-align: center
     height: 20
     width: 300
 
   Panel
-    id: waveContainer
-    anchors.top: titleBase.top
-    anchors.horizontalCenter: titleBase.horizontalCenter
-    margin-top: 3
+    id: exivaHunterBrinque_waveContainer
+    anchors.top: exivaHunterBrinque_titleBase.top
+    anchors.horizontalCenter: exivaHunterBrinque_titleBase.horizontalCenter
+    margin-top: 0
     height: 20
     width: 300
     clipping: true
     phantom: true
     visible: false
     Label
-      id: titleWave
+      id: exivaHunterBrinque_titleWave
       text: PAINEL EXIVA - BRINQUE SCRIPTS
       font: verdana-11px-rounded
       color: #FF0000
@@ -139,7 +106,7 @@ MainWindow
       width: 300
 
   Label
-    id: lblColunaEsquerda
+    id: exivaHunterBrinque_lblColunaEsquerda
     text: == ALIADOS / TEAM ==
     font: verdana-11px-rounded
     color: #44ff44
@@ -150,30 +117,30 @@ MainWindow
     text-align: center
 
   ScrollablePanel
-    id: listTeamPanel
-    anchors.top: lblColunaEsquerda.bottom
+    id: exivaHunterBrinque_listTeamPanel
+    anchors.top: exivaHunterBrinque_lblColunaEsquerda.bottom
     anchors.left: parent.left
-    anchors.bottom: lblManual.top
+    anchors.bottom: exivaHunterBrinque_lblManual.top
     margin-top: 6
     margin-bottom: 10
     width: 210
-    vertical-scrollbar: scrollTeamEx
+    vertical-scrollbar: exivaHunterBrinque_scrollTeamEx
     layout:
       type: verticalBox
       spacing: 4
 
   VerticalScrollBar
-    id: scrollTeamEx
-    anchors.top: lblColunaEsquerda.bottom
-    anchors.bottom: lblManual.top
-    anchors.left: listTeamPanel.right
+    id: exivaHunterBrinque_scrollTeamEx
+    anchors.top: exivaHunterBrinque_lblColunaEsquerda.bottom
+    anchors.bottom: exivaHunterBrinque_lblManual.top
+    anchors.left: exivaHunterBrinque_listTeamPanel.right
     margin-top: 6
     margin-bottom: 10
     step: 14
     pixels-scroll: true
 
   Label
-    id: lblColunaDireita
+    id: exivaHunterBrinque_lblColunaDireita
     text: == INIMIGOS / SCAN ==
     font: verdana-11px-rounded
     color: #ff4444
@@ -185,158 +152,158 @@ MainWindow
     text-align: center
 
   ScrollablePanel
-    id: listEnemyPanel
-    anchors.top: lblColunaDireita.bottom
+    id: exivaHunterBrinque_listEnemyPanel
+    anchors.top: exivaHunterBrinque_lblColunaDireita.bottom
     anchors.left: parent.horizontalCenter
-    anchors.bottom: lblManual.top
+    anchors.bottom: exivaHunterBrinque_lblManual.top
     margin-top: 6
     margin-left: 10
     margin-bottom: 10
     width: 210
-    vertical-scrollbar: scrollEnemyEx
+    vertical-scrollbar: exivaHunterBrinque_scrollEnemyEx
     layout:
       type: verticalBox
       spacing: 4
 
   VerticalScrollBar
-    id: scrollEnemyEx
-    anchors.top: lblColunaDireita.bottom
-    anchors.bottom: lblManual.top
-    anchors.left: listEnemyPanel.right
+    id: exivaHunterBrinque_scrollEnemyEx
+    anchors.top: exivaHunterBrinque_lblColunaDireita.bottom
+    anchors.bottom: exivaHunterBrinque_lblManual.top
+    anchors.left: exivaHunterBrinque_listEnemyPanel.right
     margin-top: 6
     margin-bottom: 10
     step: 14
     pixels-scroll: true
 
   Label
-    id: lblManual
+    id: exivaHunterBrinque_lblManual
     text: Alvo Manual / Digitar Nome:
     font: verdana-11px-rounded
-    anchors.bottom: lblTxtTargetTag.top
+    anchors.bottom: exivaHunterBrinque_lblTxtTargetTag.top
     anchors.left: parent.left
     margin-bottom: 8
 
   TextEdit
-    id: manualName
-    anchors.bottom: lblTxtTargetTag.top
-    anchors.left: lblManual.right
+    id: exivaHunterBrinque_manualName
+    anchors.bottom: exivaHunterBrinque_lblTxtTargetTag.top
+    anchors.left: exivaHunterBrinque_lblManual.right
     anchors.right: parent.right
     margin-left: 10
     margin-bottom: 6
-    height: 22
+    height: 18
 
   Label
-    id: lblTxtTargetTag
+    id: exivaHunterBrinque_lblTxtTargetTag
     text: Hotkey Target:
     font: verdana-11px-rounded
     color: #ffaa00
-    anchors.bottom: lblTxtTeamTag.top
+    anchors.bottom: exivaHunterBrinque_lblTxtTeamTag.top
     anchors.left: parent.left
     margin-bottom: 10
     width: 90
 
   Button
-    id: btnEditarKeyTarget
+    id: exivaHunterBrinque_btnEditarKeyTarget
     color: #ffffff
-    anchors.top: lblTxtTargetTag.top
-    anchors.left: lblTxtTargetTag.right
+    anchors.top: exivaHunterBrinque_lblTxtTargetTag.top
+    anchors.left: exivaHunterBrinque_lblTxtTargetTag.right
     margin-top: -3
     width: 130
     height: 20
 
   Label
-    id: lblTxtTeamTag
+    id: exivaHunterBrinque_lblTxtTeamTag
     text: Hotkey Team:
     font: verdana-11px-rounded
     color: #ffaa00
-    anchors.bottom: boxMostrarBattle.top
+    anchors.bottom: exivaHunterBrinque_boxMostrarBattle.top
     anchors.left: parent.left
     margin-bottom: 12
     width: 90
 
   Button
-    id: btnEditarKeyTeam
+    id: exivaHunterBrinque_btnEditarKeyTeam
     color: #ffffff
-    anchors.top: lblTxtTeamTag.top
-    anchors.left: lblTxtTeamTag.right
+    anchors.top: exivaHunterBrinque_lblTxtTeamTag.top
+    anchors.left: exivaHunterBrinque_lblTxtTeamTag.right
     margin-top: -3
     width: 130
     height: 20
 
   Label
-    id: lblTxtCancelTag
+    id: exivaHunterBrinque_lblTxtCancelTag
     text: Hotkey Cancel:
     font: verdana-11px-rounded
     color: #ffaa00
-    anchors.bottom: lblTxtDelayTag.top
+    anchors.bottom: exivaHunterBrinque_lblTxtDelayTag.top
     anchors.left: parent.horizontalCenter
     margin-left: 10
     margin-bottom: 10
     width: 90
 
   Button
-    id: btnEditarKeyCancel
+    id: exivaHunterBrinque_btnEditarKeyCancel
     color: #ffffff
-    anchors.top: lblTxtCancelTag.top
-    anchors.left: lblTxtCancelTag.right
+    anchors.top: exivaHunterBrinque_lblTxtCancelTag.top
+    anchors.left: exivaHunterBrinque_lblTxtCancelTag.right
     margin-top: -3
     width: 130
     height: 20
 
   Label
-    id: lblTxtDelayTag
+    id: exivaHunterBrinque_lblTxtDelayTag
     text: Delay Exiva:
     font: verdana-11px-rounded
     color: #ffaa00
-    anchors.bottom: boxMostrarBattle.top
+    anchors.bottom: exivaHunterBrinque_boxMostrarBattle.top
     anchors.left: parent.horizontalCenter
     margin-left: 10
     margin-bottom: 12
     width: 90
 
   Button
-    id: btnEditarDelayExiva
+    id: exivaHunterBrinque_btnEditarDelayExiva
     color: #ffffff
-    anchors.top: lblTxtDelayTag.top
-    anchors.left: lblTxtDelayTag.right
+    anchors.top: exivaHunterBrinque_lblTxtDelayTag.top
+    anchors.left: exivaHunterBrinque_lblTxtDelayTag.right
     margin-top: -3
     width: 130
     height: 20
 
   CheckBox
-    id: boxMostrarBattle
+    id: exivaHunterBrinque_boxMostrarBattle
     text: Mostrar Painel Battle Transparente na tela do jogo ao dar exiva
     font: verdana-11px-rounded
     color: #55ffff
-    anchors.bottom: boxPainelAutoAtivo.top
+    anchors.bottom: exivaHunterBrinque_boxPainelAutoAtivo.top
     anchors.left: parent.left
     margin-bottom: 6
     width: 450
     height: 14
 
   CheckBox
-    id: boxPainelAutoAtivo
+    id: exivaHunterBrinque_boxPainelAutoAtivo
     text: Ocultar Painel Battle Transparent apos 60 segundos sem acao
     font: verdana-11px-rounded
-    anchors.bottom: btnLimparHistoricoGeral.top
+    anchors.bottom: exivaHunterBrinque_btnLimparHistoricoGeral.top
     anchors.left: parent.left
     margin-bottom: 8
     width: 450
     height: 14
 
   Button
-    id: btnLimparHistoricoGeral
+    id: exivaHunterBrinque_btnLimparHistoricoGeral
     text: Limpar Historico (Clear Lists)
     color: #ffaa00
     font: verdana-11px-rounded
-    anchors.bottom: closeBtn.top
+    anchors.bottom: exivaHunterBrinque_closeBtn.top
     anchors.left: parent.left
     anchors.right: parent.right
     margin-bottom: 6
     height: 20
 
   Button
-    id: closeBtn
+    id: exivaHunterBrinque_closeBtn
     text: Fechar Config
     anchors.bottom: parent.bottom
     anchors.left: parent.left
@@ -349,33 +316,37 @@ exivaWindow:hide()
 
 local designPopUpOTUI = [[
 MainWindow
-  id: janelaModeloEditPop
+  id: exivaHunterBrinque_janelaModeloEditPop
   !text: tr('Editar Campo')
   size: 260 130
   anchors.centerIn: parent
   @onEscape: self:hide()
+
   Label
-    id: lblInfo
+    id: exivaHunterBrinque_lblInfo
     text: Digite o novo valor:
     anchors.top: parent.top
     anchors.left: parent.left
     margin-top: 5
+
   TextEdit
-    id: txtEntrada
+    id: exivaHunterBrinque_txtEntrada
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
     margin-top: 5
+
   Button
-    id: btnConfirmar
+    id: exivaHunterBrinque_btnConfirmar
     text: CONFIRMAR
     color: green
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.horizontalCenter
     margin-right: 4
+
   Button
-    id: btnCancelar
+    id: exivaHunterBrinque_btnCancelar
     text: Cancelar
     anchors.bottom: parent.bottom
     anchors.left: parent.horizontalCenter
@@ -385,13 +356,12 @@ MainWindow
 
 local popUpWindow = setupUI(designPopUpOTUI, widgetRaizDoJogo)
 popUpWindow:hide()
-
 -- =============================================================================
--- [BLOCO 3] PAINEL FLUTUANTE BATTLE E DEFINIÇÕES DA SETA DO MAPA
+-- [BLOCO 3] PAINEL FLUTUANTE BATTLE E DEFINIÇÕES DA SETA DO MAPA (IDS ISOLADOS)
 -- =============================================================================
 local painelBattleTrasparente = setupUI([[
 UIWindow
-  id: painelMiniBattleTransparenteExiva
+  id: exivaHunterBrinque_painelMiniBattleTransparenteExiva
   size: 160 180
   draggable: true
   phantom: false
@@ -401,7 +371,7 @@ UIWindow
   border-color: #444444bb
 
   Label
-    id: barraArrasteHeader
+    id: exivaHunterBrinque_barraArrasteHeader
     text: :: EXIVA BATTLE ::
     font: verdana-9px-bold
     color: #00bfff
@@ -413,8 +383,8 @@ UIWindow
     text-align: center
 
   ScrollablePanel
-    id: scrollInternoBattle
-    anchors.top: barraArrasteHeader.bottom
+    id: exivaHunterBrinque_scrollInternoBattle
+    anchors.top: exivaHunterBrinque_barraArrasteHeader.bottom
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: parent.bottom
@@ -426,7 +396,7 @@ UIWindow
 ]], widgetRaizDoJogo)
 painelBattleTrasparente:hide()
 
-local scrollInternoBattle = painelBattleTrasparente.scrollInternoBattle
+local scrollInternoBattle = painelBattleTrasparente.exivaHunterBrinque_scrollInternoBattle
 local painelDoMapaJogo = modules.game_interface.getMapPanel()
 
 local widgetArrow = setupUI([[
@@ -473,33 +443,33 @@ function updateIconeVisualFidelidade()
 end
 
 -- =============================================================================
--- [BLOCO 4] RENDERIZADOR COMPACTO DAS LISTAS DE GUERRA
+-- [BLOCO 4] RENDERIZADOR DAS LISTAS COORDENADO PELOS IDS EXCLUSIVOS
 -- =============================================================================
 function updateExivaUI()
     if not config or not exivaWindow or not painelBattleTrasparente then return end
     
-    -- Altera os botoes com os valores das Hotkeys brutos (Surgem em Branco Puro)
-    exivaWindow.btnEditarKeyTarget:setText(tostring(config.teclas.target):upper())
-    exivaWindow.btnEditarKeyTeam:setText(tostring(config.teclas.team):upper())
-    exivaWindow.btnEditarKeyCancel:setText(tostring(config.teclas.cancelar):upper())
-    exivaWindow.btnEditarDelayExiva:setText(tostring(config.delayMuted) .. "s")
+    -- Vincula os novos IDs de botoes longos para atualizar os valores salvos
+    exivaWindow.exivaHunterBrinque_btnEditarKeyTarget:setText(tostring(config.teclas.target):upper())
+    exivaWindow.exivaHunterBrinque_btnEditarKeyTeam:setText(tostring(config.teclas.team):upper())
+    exivaWindow.exivaHunterBrinque_btnEditarKeyCancel:setText(tostring(config.teclas.cancelar):upper())
+    exivaWindow.exivaHunterBrinque_btnEditarDelayExiva:setText(tostring(config.delayMuted) .. "s")
 
-    exivaWindow.listTeamPanel:destroyChildren()
-    exivaWindow.listEnemyPanel:destroyChildren()
+    exivaWindow.exivaHunterBrinque_listTeamPanel:destroyChildren()
+    exivaWindow.exivaHunterBrinque_listEnemyPanel:destroyChildren()
     scrollInternoBattle:destroyChildren()
 
     for _, entry in ipairs(config.teamList) do
-        local box = g_ui.createWidget('CheckBox', exivaWindow.listTeamPanel)
+        local box = g_ui.createWidget('CheckBox', exivaWindow.exivaHunterBrinque_listTeamPanel)
         box:setText(entry.name); box:setFont("verdana-11px-rounded"); box:setColor("#44ff44"); box:setHeight(15)
         box:setChecked(config.mode == "guild" and config.guildTarget:lower() == entry.name:lower())
         box.onClick = function() config.macroAtiva = true config.guildTarget = entry.name config.mode = "guild" timeoutPainelJanela = os.time() + 60 updateExivaUI() end
     end
 
     for _, entry in ipairs(config.blackList) do
-        local box = g_ui.createWidget('CheckBox', exivaWindow.listEnemyPanel)
+        local box = g_ui.createWidget('CheckBox', exivaWindow.exivaHunterBrinque_listEnemyPanel)
         box:setText(entry.name); box:setFont("verdana-11px-rounded"); box:setColor("#ff4444"); box:setHeight(15)
         box:setChecked(config.mode == "target" and config.customTarget:lower() == entry.name:lower())
-        box.onClick = function() config.macroAtiva = true config.customTarget = entry.name exivaWindow.manualName:setText(entry.name) config.mode = "target" timeoutPainelJanela = os.time() + 60 updateExivaUI() end
+        box.onClick = function() config.macroAtiva = true config.customTarget = entry.name exivaWindow.exivaHunterBrinque_manualName:setText(entry.name) config.mode = "target" timeoutPainelJanela = os.time() + 60 updateExivaUI() end
     end
 
     if config.mode ~= "none" then
@@ -528,7 +498,7 @@ function updateExivaUI()
     updateIconeVisualFidelidade()
 end
 -- =============================================================================
--- [BLOCO 5] CLIPES DE CLIQUE, TECLADO E CORE PvP DE 1 MILISSEGUNDO
+-- [BLOCO 5] GERENCIAMENTO DE CLIQUES E GANCHOS DO POP-UP SEGURO
 -- =============================================================================
 function desligarTudoCompletamente()
     config.macroAtiva = false
@@ -540,9 +510,9 @@ function desligarTudoCompletamente()
 end
 
 local function sincronizarDadosDoStorage()
-    exivaWindow.boxMostrarBattle:setChecked(config.opcoes.mostrarMiniBattle == true)
-    exivaWindow.boxPainelAutoAtivo:setChecked(config.opcoes.painelAtivo == true)
-    exivaWindow.manualName:setText(config.customTarget)
+    exivaWindow.exivaHunterBrinque_boxMostrarBattle:setChecked(config.opcoes.mostrarMiniBattle == true)
+    exivaWindow.exivaHunterBrinque_boxPainelAutoAtivo:setChecked(config.opcoes.painelAtivo == true)
+    exivaWindow.exivaHunterBrinque_manualName:setText(config.customTarget)
     exivaWindow:move(config.posicaoMestre.x, config.posicaoMestre.y)
     painelBattleTrasparente:setPosition({x = config.posicaoBattle.x, y = config.posicaoBattle.y})
     updateExivaUI()
@@ -552,17 +522,17 @@ function dispararAberturaPopUpSeguro(chaveStorage, nomeDoCampoNoMenu, subChaveTe
     campoExivaEditandoVal = chaveStorage
     campoExivaEditandoSubVal = subChaveTeclas
     popUpWindow:setText("Editar: " .. nomeDoCampoNoMenu)
-    popUpWindow.lblInfo:setText("Digite o novo valor para " .. nomeDoCampoNoMenu .. ":")
+    popUpWindow.exivaHunterBrinque_lblInfo:setText("Digite o novo valor para " .. nomeDoCampoNoMenu .. ":")
     local valorAtualNaMemoria = subChaveTeclas and tostring(config.teclas[subChaveTeclas] or "") or tostring(config[chaveStorage] or "")
-    popUpWindow.txtEntrada:setText(valorAtualNaMemoria)
-    popUpWindow:show() popUpWindow:raise() popUpWindow:focus() popUpWindow.txtEntrada:focus()
+    popUpWindow.exivaHunterBrinque_txtEntrada:setText(valorAtualNaMemoria)
+    popUpWindow:show() popUpWindow:raise() popUpWindow:focus() popUpWindow.exivaHunterBrinque_txtEntrada:focus()
 end
 
--- Atribuição de cliques para os botões brancos abrirem o Pop-Up Seguro
-exivaWindow.btnEditarKeyTarget.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Target (Inimigo)", "target") end
-exivaWindow.btnEditarKeyTeam.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Team (Aliado)", "team") end
-exivaWindow.btnEditarKeyCancel.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Cancel (Desligar)", "cancelar") end
-exivaWindow.btnEditarDelayExiva.onClick = function() dispararAberturaPopUpSeguro("delayMuted", "Delay do Exiva Hunter", nil) end
+-- Atribuição de cliques para os botões brancos abrirem o Pop-Up Seguro isolado
+exivaWindow.exivaHunterBrinque_btnEditarKeyTarget.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Target (Inimigo)", "target") end
+exivaWindow.exivaHunterBrinque_btnEditarKeyTeam.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Team (Aliado)", "team") end
+exivaWindow.exivaHunterBrinque_btnEditarKeyCancel.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Cancel (Desligar)", "cancelar") end
+exivaWindow.exivaHunterBrinque_btnEditarDelayExiva.onClick = function() dispararAberturaPopUpSeguro("delayMuted", "Delay do Exiva Hunter", nil) end
 
 botoesLateraisUI.btnMestreExivaOnOffSwitch.onClick = function()
     config.macroAtiva = not config.macroAtiva
@@ -570,21 +540,21 @@ botoesLateraisUI.btnMestreExivaOnOffSwitch.onClick = function()
 end
 
 botoesLateraisUI.btnSetupExiva.onClick = function() if exivaWindow:isVisible() then exivaWindow:hide() else exivaWindow:show() exivaWindow:raise() exivaWindow:focus() sincronizarDadosDoStorage() end end
-exivaWindow.closeBtn.onClick = function() exivaWindow:hide() end
-exivaWindow.boxMostrarBattle.onClick = function(w) local estado = not w:isChecked() w:setChecked(estado) config.opcoes.mostrarMiniBattle = estado updateExivaUI() end
-exivaWindow.boxPainelAutoAtivo.onClick = function(w) local estado = not w:isChecked() w:setChecked(estado) config.opcoes.painelAtivo = estado end
+exivaWindow.exivaHunterBrinque_closeBtn.onClick = function() exivaWindow:hide() end
+exivaWindow.exivaHunterBrinque_boxMostrarBattle.onClick = function(w) local estado = not w:isChecked() w:setChecked(estado) config.opcoes.mostrarMiniBattle = estado updateExivaUI() end
+exivaWindow.exivaHunterBrinque_boxPainelAutoAtivo.onClick = function(w) local estado = not w:isChecked() w:setChecked(estado) config.opcoes.painelAtivo = estado end
 exivaWindow.onMove = function(w, oldPos, newPos) config.posicaoMestre.x = newPos.x config.posicaoMestre.y = newPos.y end
-exivaWindow.manualName.onTextChange = function(w, text) config.customTarget = text:trim() end
+exivaWindow.exivaHunterBrinque_manualName.onTextChange = function(w, text) config.customTarget = text:trim() end
 
-exivaWindow.btnLimparHistoricoGeral.onClick = function()
-    config.blackList = {} config.customTarget = "" exivaWindow.manualName:setText("") config.mode = "none" painelBattleTrasparente:hide() updateExivaUI() print(">>> [EXIVA] Historico de nomes limpo manualmente!") 
+exivaWindow.exivaHunterBrinque_btnLimparHistoricoGeral.onClick = function()
+    config.blackList = {} config.customTarget = "" exivaWindow.exivaHunterBrinque_manualName:setText("") config.mode = "none" painelBattleTrasparente:hide() updateExivaUI() print(">>> [EXIVA] Historico de nomes limpo manualmente via Botao Clear!") 
 end
 
 painelBattleTrasparente.onGeometryChange = function(widget, oldGeom, newGeometry) config.posicaoBattle.x = newGeometry.x config.posicaoBattle.y = newGeometry.y end
 
-popUpWindow.btnCancelar.onClick = function() popUpWindow:hide() end
-popUpWindow.btnConfirmar.onClick = function()
-    local entradaDigitada = popUpWindow.txtEntrada:getText():trim()
+popUpWindow.exivaHunterBrinque_btnCancelar.onClick = function() popUpWindow:hide() end
+popUpWindow.exivaHunterBrinque_btnConfirmar.onClick = function()
+    local entradaDigitada = popUpWindow.exivaHunterBrinque_txtEntrada:getText():trim()
     if campoExivaEditandoVal ~= "" then
         if campoExivaEditandoSubVal then config.teclas[campoExivaEditandoSubVal] = entradaDigitada
         elseif campoExivaEditandoVal == "delayMuted" then config.delayMuted = tonumber(entradaDigitada) or 0.5
@@ -592,6 +562,9 @@ popUpWindow.btnConfirmar.onClick = function()
     end
     popUpWindow:hide() updateExivaUI()
 end
+-- =============================================================================
+-- [BLOCO 6] LISTENERS DE TECLADO E MOTORES DE AGRESSÃO DE WAR (1ms)
+-- =============================================================================
 
 onKeyPress(function(keys)
     if modules.game_console:isChatEnabled() then return end
@@ -616,6 +589,7 @@ onTextMessage(function(mode, text)
     if d then showExivaArrow(d) end
 end)
 
+-- SEU MOTOR PRINCIPAL PvP ULTRA REACTIVE INSTANTÂNEO DE 1ms
 macro(1, function()
     local attackingCreature = g_game.getAttackingCreature()
     if config.opcoes.priorizarTarget and attackingCreature and attackingCreature:isPlayer() then
@@ -623,7 +597,7 @@ macro(1, function()
         if config.customTarget:lower() ~= nomeAlvoAtaque:lower() then
             config.macroAtiva = true
             config.customTarget = nomeAlvoAtaque
-            if exivaWindow then exivaWindow.manualName:setText(nomeAlvoAtaque) end
+            if exivaWindow then exivaWindow.exivaHunterBrinque_manualName:setText(nomeAlvoAtaque) end
             config.mode = "target"
             
             local achouNaLista = false
@@ -648,14 +622,15 @@ macro(1, function()
     end
 end)
 
--- LOOP REATIVO DO PISCA DO TITULO (400ms)
+-- LOOP REATIVO DO PISCA DO TITULO COM ID TOTALMENTE ISOLADO (400ms)
 macro(400, function()
-    if exivaWindow and exivaWindow:isVisible() and exivaWindow.waveContainer then
-        local estadoAtual = exivaWindow.waveContainer:isVisible()
-        exivaWindow.waveContainer:setVisible(not estadoAtual)
+    if exivaWindow and exivaWindow:isVisible() and exivaWindow.exivaHunterBrinque_waveContainer then
+        local estadoAtual = exivaWindow.exivaHunterBrinque_waveContainer:isVisible()
+        exivaWindow.exivaHunterBrinque_waveContainer:setVisible(not estadoAtual)
     end
 end)
 
+-- LOOP SECUNDÁRIO DE CONTATO VISUAL E VARREDURA DE ALIADOS LOUCOS
 macro(1000, function()
     if not config.macroAtiva then return end
     if config.opcoes.painelAtivo and painelBattleTrasparente:isVisible() and timeoutPainelJanela > 0 then
@@ -690,15 +665,15 @@ macro(1000, function()
     if mudouLista or exivaWindow:isVisible() then updateExivaUI() end
 end)
 
--- VARREDURA FINAL DA MEMÓRIA RAM DO CLIENT CONTRA ELEMENTOS DUPLICADOS
+-- VARREDURA REAL DO RECONSTRUTOR DE RAM CONTRA JANELAS DUPLICADAS POR IDS EXCLUSIVOS
 for _, child in pairs(widgetRaizDoJogo:getChildren()) do 
-    if child:getId() == "janelaGeralExivaHunterMestre" and child ~= exivaWindow then child:destroy() end 
-    if child:getId() == "janelaModeloEditPop" and child ~= popUpWindow then child:destroy() end
-    if child:getId() == "painelMiniBattleTransparenteExiva" and child ~= painelBattleTrasparente then child:destroy() end
+    if child:getId() == "exivaHunterBrinque_janelaGeralMestre" and child ~= exivaWindow then child:destroy() end 
+    if child:getId() == "exivaHunterBrinque_janelaModeloEditPop" and child ~= popUpWindow then child:destroy() end
+    if child:getId() == "exivaHunterBrinque_painelMiniBattleTransparenteExiva" and child ~= painelBattleTrasparente then child:destroy() end
 end
 
-exivaWindow.boxMostrarBattle:setChecked(config.opcoes.mostrarMiniBattle == true)
-exivaWindow.boxPainelAutoAtivo:setChecked(config.opcoes.painelAtivo == true)
+exivaWindow.exivaHunterBrinque_boxMostrarBattle:setChecked(config.opcoes.mostrarMiniBattle == true)
+exivaWindow.exivaHunterBrinque_boxPainelAutoAtivo:setChecked(config.opcoes.painelAtivo == true)
 exivaWindow:move(config.posicaoMestre.x, config.posicaoMestre.y)
 painelBattleTrasparente:setPosition({x = config.posicaoBattle.x, y = config.posicaoBattle.y})
 updateExivaUI()
