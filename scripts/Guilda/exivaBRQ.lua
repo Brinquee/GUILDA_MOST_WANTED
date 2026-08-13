@@ -1,5 +1,5 @@
 UI.Separator()
-setDefaultTab("WAR") -- Garante que os créditos apareçam na aba HP do Healer
+setDefaultTab("Tools") -- Garante que os créditos apareçam na aba HP do Healer
 
 -- =============================================================================
 -- [PAINEL DE CRÉDITOS E SUPORTE - BRINQUE SCRIPT NATIVO ANIMADO]
@@ -9,9 +9,9 @@ local available = false
 
 
 -- 1. Rótulo Principal: Nome da Marca Destacado em Vermelho Original
-local labelBrinqueMarca = UI.Label("V-v  BRINQUE WAR  v-V")
+local labelBrinqueMarca = UI.Label("V-v  BRINQUE Tools  v-V")
 if labelBrinqueMarca then
-    labelBrinqueMarca:setColor("#ffFF00") -- Cor Vermelho de Elite
+    labelBrinqueMarca:setColor("#ffff00") -- Cor Vermelho de Elite
     labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
 end
 
@@ -68,7 +68,7 @@ local delayExivaTimer = 0
 local campoExivaEditandoVal = ""
 local campoExivaEditandoSubVal = nil
 
-local painelDaAbaCave = getTab("WAR")
+local painelDaAbaCave = getTab("Tools")
 if painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos") then
     painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos"):destroy()
 end
