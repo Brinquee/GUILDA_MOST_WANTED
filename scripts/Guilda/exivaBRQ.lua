@@ -9,7 +9,7 @@ local available = false
 
 
 -- 1. Rótulo Principal: Nome da Marca Destacado em Vermelho Original
-local labelBrinqueMarca = UI.Label("V  BRINQUE WAR  V")
+local labelBrinqueMarca = UI.Label("V-v  BRINQUE WAR  v-V")
 if labelBrinqueMarca then
     labelBrinqueMarca:setColor("#ffFF00") -- Cor Vermelho de Elite
     labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
