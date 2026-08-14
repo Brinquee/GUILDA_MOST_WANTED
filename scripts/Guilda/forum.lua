@@ -11,8 +11,8 @@ local widgetRaizDoJogo = g_ui.getRootWidget()
 -- =============================================================================
 -- [FORUM - PARTE 1 DE 4] TEXTOS DA ABA DE ANUNCIOS DO TOPO
 -- =============================================================================
-local ANUNCIO_TITULO = "ATUALIZACAO V2.4 LIBERADA!"
-local ANUNCIO_TEXTO  = "Melhorias aplicadas no tempo de cura e no Anti-Push.\nNovas macros de War foram adicionadas na aba lateral.\nFique atento aos prazos de vencimento da sua licenca!"
+local ANUNCIO_TITULO = "ATUALIZACAO Nos Macros EXIVA e MW no PE!"
+local ANUNCIO_TEXTO  = "Melhorias aplicadas e Correçao !"
 
 -- WEBHOOK EXCLUSIVO DO FORUM: Cole a URL do canal do Discord onde quer receber os relatos
 local URL_WEBHOOK_FORUM = "COLE_AQUI_A_URL_DO_WEBHOOK_DO_FORUM_DO_DISCORD"
@@ -218,7 +218,7 @@ Panel
     text: Abrir Forum
     font: verdana-11px-rounded
     color: #e6bc22
-  ]], getTab("GUILD"))
+  ]], getTab("main"))
     
     uiBotaoForumLateral.btnAbrirPainelForum.onClick = function()
         if setupForumWindow:isVisible() then 
