@@ -12,9 +12,9 @@ local config = storage.mwallPainelConfig
 if config.mwMacroPeAtivo == nil then config.mwMacroPeAtivo = false end
 if config.mwAutoTargetAtivo == nil then config.mwAutoTargetAtivo = false end
 if config.modoCerco == nil then config.modoCerco = 0 end
-if not config.hotkeyMwall then config.hotkeyMwall = "F10" end
+if not config.hotkeyMwall then config.hotkeyMwall = "" end
 if not config.runeIdMwall then config.runeIdMwall = 3180 end
-if not config.hotkeyTargetMw then config.hotkeyTargetMw = "F5" end
+if not config.hotkeyTargetMw then config.hotkeyTargetMw = "" end
 if not config.squaresThreshold then config.squaresThreshold = 2 end
 if not config.delayTargetMw then config.delayTargetMw = 100 end
 
