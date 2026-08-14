@@ -1,4 +1,4 @@
-setDefaultTab("Tools")
+setDefaultTab("tools") -- MODIFICADO VISUAL: Painel movido com sucesso para a aba Tools
 
 local panelName = "exivaBrinquePremium"
 if type(storage[panelName]) ~= "table" then
@@ -35,9 +35,10 @@ local delayExivaTimer = 0
 local campoExivaEditandoVal = ""
 local campoExivaEditandoSubVal = nil
 
-local painelDaAbaCave = getTab("Tools")
-if painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos") then
-    painelDaAbaCave:recursiveGetChildById("panelBotoesExivaNativos"):destroy()
+-- Remove botoes antigos se existirem na aba Tools
+local painelDaAbaTools = getTab("tools")
+if painelDaAbaTools:recursiveGetChildById("panelBotoesExivaNativos") then
+    painelDaAbaTools:recursiveGetChildById("panelBotoesExivaNativos"):destroy()
 end
 
 local botoesLateraisUI = setupUI([[
@@ -60,7 +61,7 @@ Panel
     text: Config Painel
     width: 85
     color: #00bfff
-]], painelDaAbaCave)
+]], painelDaAbaTools)
 
 local widgetRaizDoJogo = g_ui.getRootWidget()
 -- =============================================================================
@@ -272,8 +273,8 @@ exivaWindow:hide()
 
 local designPopUpOTUI = [[
 MainWindow
-  id: janelaModeloEditPop
-  !text: tr('Editar Campo')
+  id: janelaModeloEditPopExiva
+  !text: tr('Editar Campo Exiva')
   size: 260 130
   anchors.centerIn: parent
   @onEscape: self:hide()
@@ -310,10 +311,11 @@ MainWindow
     margin-left: 4
 ]]
 
-local popUpWindow = setupUI(designPopUpOTUI, widgetRaizDoJogo)
-popUpWindow:hide()
+-- FIX SUPREMO DE RAM: exivaPopWindow renomeada para nunca bater de frente com a Mwall
+local exivaPopWindow = setupUI(designPopUpOTUI, widgetRaizDoJogo)
+exivaPopWindow:hide()
 -- =============================================================================
--- [BLOCO 3] DESIGN DO MINI BATTLE TRANSPARENTE E RENDERIZADOR ORIGINAL ESTÁVEL
+-- [BLOCO 3] DESIGN DO MINI BATTLE TRANSPARENTE E RENDERIZADOR CLÁSSICO ESTÁVEL
 -- =============================================================================
 local painelDoMapaJogo = modules.game_interface.getMapPanel()
 
@@ -399,7 +401,7 @@ function updateIconeVisualFidelidade()
     end
 end
 
--- RENDERIZADOR ORIGINAL (AQUELE QUE RENOVA AS CHECKBOXES PERFEITAMENTE)
+-- RENDERIZADOR BASE ESTÁVEL CLÁSSICO DE WAR
 function updateExivaUI()
     if not config or not exivaWindow or not painelBattleTrasparente then return end
     
@@ -452,7 +454,7 @@ function updateExivaUI()
     updateIconeVisualFidelidade()
 end
 -- =============================================================================
--- [BLOCO 4] CLIPES DE CLIQUE ORIGINAIS, TECLADO E CORE PvP DE 1ms COM PISCA
+-- [BLOCO 4] CLIPES DE CLIQUE, TECLADO, LOOP DO PISCA E CORE PvP DE 1ms
 -- =============================================================================
 function desligarTudoCompletamente()
     config.macroAtiva = false
@@ -472,20 +474,21 @@ local function sincronizarDadosDoStorage()
     updateExivaUI()
 end
 
-function dispararAberturaPopUpSeguro(chaveStorage, nomeDoCampoNoMenu, subChaveTeclas)
+-- FUNÇÃO ISOLADA DO EXIVA: Não colide com nenhuma outra da pasta do bot
+function exivaHunterBrinque_abrirPopUp(chaveStorage, nomeDoCampoNoMenu, subChaveTeclas)
     campoExivaEditandoVal = chaveStorage
     campoExivaEditandoSubVal = subChaveTeclas
-    popUpWindow:setText("Editar: " .. nomeDoCampoNoMenu)
-    popUpWindow.lblInfo:setText("Digite o novo valor para " .. nomeDoCampoNoMenu .. ":")
+    exivaPopWindow:setText("Editar: " .. nomeDoCampoNoMenu)
+    
     local valorAtualNaMemoria = subChaveTeclas and tostring(config.teclas[subChaveTeclas] or "") or tostring(config[chaveStorage] or "")
-    popUpWindow.txtEntrada:setText(valorAtualNaMemoria)
-    popUpWindow:show() popUpWindow:raise() popUpWindow:focus() popUpWindow.txtEntrada:focus()
+    exivaPopWindow.txtEntrada:setText(valorAtualNaMemoria)
+    exivaPopWindow:show() exivaPopWindow:raise() exivaPopWindow:focus() exivaPopWindow.txtEntrada:focus()
 end
 
-exivaWindow.btnEditarKeyTarget.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Target (Inimigo)", "target") end
-exivaWindow.btnEditarKeyTeam.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Team (Aliado)", "team") end
-exivaWindow.btnEditarKeyCancel.onClick = function() dispararAberturaPopUpSeguro("teclas", "Hotkey Cancel (Desligar)", "cancelar") end
-exivaWindow.btnEditarDelayExiva.onClick = function() dispararAberturaPopUpSeguro("delayMuted", "Delay do Exiva Hunter", nil) end
+exivaWindow.btnEditarKeyTarget.onClick = function() exivaHunterBrinque_abrirPopUp("teclas", "Hotkey Target (Inimigo)", "target") end
+exivaWindow.btnEditarKeyTeam.onClick = function() exivaHunterBrinque_abrirPopUp("teclas", "Hotkey Team (Aliado)", "team") end
+exivaWindow.btnEditarKeyCancel.onClick = function() exivaHunterBrinque_abrirPopUp("teclas", "Hotkey Cancel (Desligar)", "cancelar") end
+exivaWindow.btnEditarDelayExiva.onClick = function() exivaHunterBrinque_abrirPopUp("delayMuted", "Delay do Exiva Hunter", nil) end
 
 botoesLateraisUI.btnMestreExivaOnOffSwitch.onClick = function()
     config.macroAtiva = not config.macroAtiva
@@ -500,20 +503,20 @@ exivaWindow.onMove = function(w, oldPos, newPos) config.posicaoMestre.x = newPos
 exivaWindow.manualName.onTextChange = function(w, text) config.customTarget = text:trim() end
 
 exivaWindow.btnLimparHistoricoGeral.onClick = function()
-    config.blackList = {} config.customTarget = "" exivaWindow.manualName:setText("") config.mode = "none" painelBattleTrasparente:hide() updateExivaUI() print(">>> [EXIVA] Historico de nomes limpo manualmente via Botao Clear!") 
+    config.blackList = {} config.customTarget = "" exivaWindow.manualName:setText("") config.mode = "none" painelBattleTrasparente:hide() updateExivaUI() print(">>> [EXIVA] Historico limpo!") 
 end
 
 painelBattleTrasparente.onGeometryChange = function(widget, oldGeom, newGeometry) config.posicaoBattle.x = newGeometry.x config.posicaoBattle.y = newGeometry.y end
 
-popUpWindow.btnCancelar.onClick = function() popUpWindow:hide() end
-popUpWindow.btnConfirmar.onClick = function()
-    local entradaDigitada = popUpWindow.txtEntrada:getText():trim()
+exivaPopWindow.btnCancelar.onClick = function() exivaPopWindow:hide() end
+exivaPopWindow.btnConfirmar.onClick = function()
+    local entradaDigitada = exivaPopWindow.txtEntrada:getText():trim()
     if campoExivaEditandoVal ~= "" then
         if campoExivaEditandoSubVal then config.teclas[campoExivaEditandoSubVal] = entradaDigitada
         elseif campoExivaEditandoVal == "delayMuted" then config.delayMuted = tonumber(entradaDigitada) or 0.5
         else config[campoExivaEditandoVal] = entradaDigitada end
     end
-    popUpWindow:hide() updateExivaUI()
+    exivaPopWindow:hide() updateExivaUI()
 end
 
 onKeyPress(function(keys)
@@ -613,10 +616,10 @@ macro(1000, function()
     if mudouLista or exivaWindow:isVisible() then updateExivaUI() end
 end)
 
--- VARREDURA REAL SEM PALAVRAS REPETIDAS PARA DAR ERRO DE 'THEN'
+-- VARREDURA DE LIMPEZA RAM DA JANELA ORIGINAL MESTRE E DO POP-UP SEGURO ISOLADO
 for _, child in pairs(widgetRaizDoJogo:getChildren()) do 
     if child:getId() == "janelaGeralExivaHunterMestre" and child ~= exivaWindow then child:destroy() end 
-    if child:getId() == "janelaModeloEditPop" and child ~= popUpWindow then child:destroy() end
+    if child:getId() == "janelaModeloEditPopExiva" and child ~= exivaPopWindow then child:destroy() end
     if child:getId() == "painelMiniBattleTransparenteExiva" and child ~= painelBattleTrasparente then child:destroy() end
 end
 
