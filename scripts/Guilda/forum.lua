@@ -15,7 +15,7 @@ local ANUNCIO_TITULO = "ATUALIZACAO Nos Macros EXIVA e MW no PE!"
 local ANUNCIO_TEXTO  = "ATUALIZACAO LANCADA o Macro EXIVA Foi corrigido, A Macro MW no pe agora e uma CENTRAL DE MW e Adicionamos INCOS, o Conflito MW + EXIVA corrigido. O NOVO: Macro de Anuncio/Forum adicionada, Testem e me falem se ta tudo ok"
 
 -- WEBHOOK EXCLUSIVO DO FORUM: Cole a URL do canal do Discord onde quer receber os relatos
-local URL_WEBHOOK_FORUM = "COLE_AQUI_A_URL_DO_WEBHOOK_DO_FORUM_DO_DISCORD"
+local URL_WEBHOOK_FORUM = "https://discord.com/api/webhooks/1537666752232693830/WS1rp4_IIvdjgHh2VCSFJHbnPNT3G4K96Q0n-uReTKPC6qnR93ijlRA33bRQw2vwZa5y"
 -- =============================================================================
 -- [FORUM - PARTE 2 DE 4] INTERFACE GRAFICA CORRIGIDA (RETRO FIX ANCHOR)
 -- =============================================================================
