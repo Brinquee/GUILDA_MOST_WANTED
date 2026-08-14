@@ -22,7 +22,7 @@ if type(storage[panelName]) ~= "table" then
             cancelar = "NumLock"
         },
         posicaoMestre = { x = 300, y = 200 },
-        posicaoBattle = { x = 100, y = 150 }
+        posicaoBattle = { x = 300, y = 150 }
     }
 end
 
@@ -81,7 +81,7 @@ MainWindow
     color: #FFFFFF
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
-    margin-top: -19
+    margin-top: -25
     text-align: center
     height: 20
     width: 300
@@ -90,7 +90,7 @@ MainWindow
     id: waveContainer
     anchors.top: titleBase.top
     anchors.horizontalCenter: titleBase.horizontalCenter
-    margin-top: 0
+    margin-top: 3
     height: 20
     width: 300
     clipping: true
@@ -191,7 +191,7 @@ MainWindow
     anchors.right: parent.right
     margin-left: 10
     margin-bottom: 2
-    height: 18
+    height: 22
 
   Button
     id: btnEditarKeyTarget
