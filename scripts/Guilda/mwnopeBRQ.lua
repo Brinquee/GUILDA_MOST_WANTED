@@ -250,12 +250,16 @@ local function tacarRunaNaPos(pos, idRunaForcada)
     if tile then useWith(idRunaForcada or config.runeIdMwall or 3180, tile:getTopUseThing()) end
 end
 -- =============================================================================
--- [MWALL - PARTE 3 DE 4] MOTORES ANÔNIMOS EM LUA - BARRA LATERAL 100% LIMPA
+-- [MWALL - PARTE 3 DE 4] MOTORES REAIS ATRELADOS AOS ICONES NATIVOS (SEM COMPLICACOES)
 -- =============================================================================
 
+-- DETECTOR DINÂMICO: Le o storage a cada clique, aceitando mudancas na hora sem precisar de reload
 onKeyPress(function(keys)
     if modules.game_console:isChatEnabled() then return end
-    if config.hotkeyMudarModo and keys:lower() == config.hotkeyMudarModo:lower() then
+    
+    local hotkeyAtual = config.hotkeyMudarModo or "F6"
+    
+    if keys:lower() == hotkeyAtual:lower() then
         config.modoCerco = config.modoCerco + 1
         if config.modoCerco > 4 then config.modoCerco = 0 end
         atualizarTextoDosBotoesPainel()
@@ -329,45 +333,44 @@ local function dispararGeometriaDeCombate(idRunaAlvo)
     end
 end
 
--- CRIAÇÃO DOS MACROS SEM NOME EM STRING (OMITIDO PARA NÃO GERAR BOTÕES NA ABA LATERAL)
+-- AS 4 ENGINES DOS MACROS COM AS FUNÇÕES CONECTADAS DE VERDADE
+-- Nomes omitidos para nao gerar botoes cinzas na barra lateral do bot
 local macroPeMw = macro(100, function() end)
+
 local macroTargetMw = macro(20, function()
     if modules.game_console:isChatEnabled() then return end
     local agora = os.clock() * 1000
     if agora - ultimoDisparoMw >= (config.delayTargetMw or 100) then
-        if config.mwAutoTargetAtivo then
-            dispararGeometriaDeCombate(config.runeIdMwall or 3180)
-            ultimoDisparoMw = agora
-        end
+        dispararGeometriaDeCombate(config.runeIdMwall or 3180)
+        ultimoDisparoMw = agora
     end
 end)
 
 local macroPeGrowth = macro(100, function() end)
+
 local macroTargetGrowth = macro(20, function()
     if modules.game_console:isChatEnabled() then return end
     local agora = os.clock() * 1000
     if agora - ultimoDisparoMw >= (config.delayTargetMw or 100) then
-        if config.growthAutoTargetAtivo then
-            dispararGeometriaDeCombate(config.runeIdMato or 3156)
-            ultimoDisparoMw = agora
-        end
+        dispararGeometriaDeCombate(config.runeIdMato or 3156)
+        ultimoDisparoMw = agora
     end
 end)
 
--- MOTORES DE RASTRO DE MOVIMENTO NO PROPRIO PE
+-- MOTOR DE RASTRO DE MOVIMENTO NO PROPRIO PE SENSE REAIS
 onPlayerPositionChange(function(newPos, oldPos)
     if not oldPos or oldPos.z ~= posz() then return end
     local tile = g_map.getTile(oldPos)
     if not tile or not tile:isWalkable() then return end
     
-    if config.mwMacroPeAtivo then
+    if macroPeMw:isOn() then
         tacarRunaNaPos(oldPos, config.runeIdMwall or 3180)
-    elseif config.growthMacroPeAtivo then
+    elseif macroPeGrowth:isOn() then
         tacarRunaNaPos(oldPos, config.runeIdMato or 3156)
     end
 end)
 
--- CRIAÇÃO DOS ÍCONES PASSANDO DIRETAMENTE OS ATIVADORES ANÔNIMOS REAIS
+-- CRIAÇÃO DOS ÍCONES PASSANDO DIRETAMENTE OS ATIVADORES ANÔNIMOS REAIS CONECTADOS
 local iconePeMw = addIcon("IconPeMw", {item = config.runeIdMwall or 3180, text = "Pe"}, macroPeMw)
 iconePeMw:breakAnchors()
 
@@ -380,20 +383,19 @@ iconePeGrowth:breakAnchors()
 local iconeTargetGrowth = addIcon("IconTargetGrowth", {item = config.runeIdMato or 3156, text = "TG"}, macroTargetGrowth)
 iconeTargetGrowth:breakAnchors()
 
--- Sincroniza posições iniciais salvas do storage
+-- Sincroniza posicoes iniciais salvas do storage
 iconePeMw:move(config.iconePeX, config.iconePeY)
 iconeTargetMw:move(config.iconeTargetX, config.iconeTargetY)
 iconePeGrowth:move(config.iconeGrowthPeX, config.iconeGrowthPeY)
 iconeTargetGrowth:move(config.iconeGrowthX, config.iconeGrowthY)
 
--- INTERCEPTOR GERAL: Atualiza o storage em Lua de forma estável e gerencia as travas mútuas
+-- INTERCEPTOR GERAL DO STORAGE E TRAVAS MUTUAS NATIVAS ANTI-STACK
 macro(50, function()
     config.mwMacroPeAtivo = macroPeMw:isOn()
     config.mwAutoTargetAtivo = macroTargetMw:isOn()
     config.growthMacroPeAtivo = macroPeGrowth:isOn()
     config.growthAutoTargetAtivo = macroTargetGrowth:isOn()
 
-    -- Travas nativas anti-stack PvP
     if macroPeMw:isOn() and macroPeGrowth:isOn() then macroPeGrowth:setOff() end
     if macroTargetMw:isOn() and macroTargetGrowth:isOn() then macroTargetGrowth:setOff() end
     if macroPeGrowth:isOn() and macroPeMw:isOn() then macroPeMw:setOff() end
