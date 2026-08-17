@@ -11,8 +11,8 @@ local widgetRaizDoJogo = g_ui.getRootWidget()
 -- =============================================================================
 -- [FORUM - PARTE 1 DE 4] TEXTOS DA ABA DE ANUNCIOS DO TOPO
 -- =============================================================================
-local ANUNCIO_TITULO = "ATUALIZACAO NOS MACROS EXIVA e MW no PE! Testem e me falem se ta tudo ok"
-local ANUNCIO_TEXTO  = "O NOVO: Macro de Anuncio/Forum adicionada, Exiva e Mw no pe arrumado."
+local ANUNCIO_TITULO = "ATUALIZACAO NO MW no PE! Testem e me falem se ta tudo ok"
+local ANUNCIO_TEXTO  = "Sobre os macros de Pushe, estou tramalhando neles em breve lanço eles.."
 
 -- WEBHOOK EXCLUSIVO DO FORUM: Cole a URL do canal do Discord onde quer receber os relatos
 local URL_WEBHOOK_FORUM = "https://discord.com/api/webhooks/1537666752232693830/WS1rp4_IIvdjgHh2VCSFJHbnPNT3G4K96Q0n-uReTKPC6qnR93ijlRA33bRQw2vwZa5y"
