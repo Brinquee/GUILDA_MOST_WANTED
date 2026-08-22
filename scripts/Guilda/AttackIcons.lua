@@ -1,5 +1,5 @@
-setDefaultTab("Main")
-
+setDefaultTab("tools")
+UI.Separator()
 -- 1. DECLARAÇÃO DOS ESTILOS E DA MAINWINDOW COM POPUP TEXTEDIT ATIVO (OTUI)
 g_ui.loadUIFromString([[
 IconTabButton < Button
