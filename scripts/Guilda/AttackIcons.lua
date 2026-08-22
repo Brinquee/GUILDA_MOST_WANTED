@@ -496,17 +496,17 @@ local function buildUnifiedPanelSlots()
     addTextEditField("spellText", "Magia de Area (UE):", "exevo gran mas flam", upLeft)
 
     -- 2. Safe Spells
-    addTextEditField("iconIdSafeSpells", "ID Imagem Safe Spells:", "3071", upLeft)
+    addTextEditField("iconIdSafeSpells", "ID Imagem Safe Spells:", "8080", upLeft)
     addTextEditField("spellText1", "Magia de Area (Seguro):", "exevo mas san", upLeft)
     addTextEditField("spellText2", "Magia Single (Alvo):", "exori con", upLeft)
 
     -- 3. Full Spell
-    addTextEditField("iconIdFullSpell", "ID Imagem Full Spell:", "8078", upRight)
+    addTextEditField("iconIdFullSpell", "ID Imagem Full Spell:", "8077", upRight)
     addTextEditField("fullSpell", "Magia para Spammar:", "exevo gran mas frigo", upRight)
 
     -- 4. Safe Runes Area e Single
-    addTextEditField("iconIdSafeRunes", "ID Imagem Safe Runes:", "3152", upRight)
-    addItemSlot("safeRunesID1", "Runa Area (ID Slot):", 3150, upRight, "Arraste a runa de área para usar em SQMs seguros")
+    addTextEditField("iconIdSafeRunes", "ID Imagem Safe Runes:", "11624", upRight)
+    addItemSlot("safeRunesID1", "Runa Area (ID Slot):", 3161, upRight, "Arraste a runa de área para usar em SQMs seguros")
     addItemSlot("safeRunesID2", "Runa Single (ID Slot):", 3155, upRight, "Arraste a runa single para usar em SQMs perigosos")
 
     -- ===========================================================================
@@ -517,7 +517,7 @@ local function buildUnifiedPanelSlots()
     warLabel:setColor("#00BFFF")
 
     -- 1. Attack Rune
-    addTextEditField("iconIdAttackRune", "ID Imagem Attack Rune:", "3155", warLeft)
+    addTextEditField("iconIdAttackRune", "ID Imagem Attack Rune:", "11610", warLeft)
     addItemSlot("localName", "Runa Atk no Alvo (ID Slot):", 3155, warLeft, "Arraste a runa de ataque contínuo que vai no target")
 
     -- 2. PLYZE (Paralyze)
@@ -525,15 +525,15 @@ local function buildUnifiedPanelSlots()
     addItemSlot("paralyzeRuneID", "Runa Paralyze (ID Slot):", 3165, warLeft, "Arraste a sua runa de Paralyze verdadeira")
 
     -- 3. Exori Gran Con (Paladin)
-    addTextEditField("iconIdExoriGranCon", "ID Imagem Gran Con:", "3239", warRight)
+    addTextEditField("iconIdExoriGranCon", "ID Imagem Gran Con:", "8081", warRight)
     addTextEditField("spellExoriGranCon", "Magia Paladin Name:", "exori gran con", warRight)
 
     -- 4. Exori Gran Hur (Knight)
-    addTextEditField("iconIdExoriGranHur", "ID Imagem Gran Hur:", "3271", warRight)
+    addTextEditField("iconIdExoriGranHur", "ID Imagem Gran Hur:", "8078", warRight)
     addTextEditField("spellExoriGranHur", "Magia Knight Name:", "exori gran hur", warRight)
 
     -- 5. Exori Gran Frigo (Druid)
-    addTextEditField("iconIdExoriGranFrigo", "ID Imagem Gran Frigo:", "3156", warRight)
+    addTextEditField("iconIdExoriGranFrigo", "ID Imagem Gran Frigo:", "8079", warRight)
     addTextEditField("spellExoriGranFrigo", "Magia Druid Name:", "exori gran frigo", warRight)
   end)
 
