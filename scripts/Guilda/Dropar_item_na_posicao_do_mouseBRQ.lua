@@ -19,8 +19,8 @@ if not storage.dropSettings then
         enabledChao = false,   -- Estado do drop no chão (pés)
         itemTextList = "3031, 3035, 2981", -- IDs padrões separados por vírgula
         dropSpeed = 100,       -- Velocidade do drop em milissegundos
-        hotkeyMouse = "F11",   -- Hotkey para o mouse
-        hotkeyChao = "F12",    -- Hotkey para os pés (chão)
+        hotkeyMouse = "",   -- Hotkey para o mouse
+        hotkeyChao = "",    -- Hotkey para os pés (chão)
         useDestroy = false,    -- Estado do Auto Destroy nos pés
         destroyRuneId = 3148   -- ID padrão da runa de Destroy Field
     }
