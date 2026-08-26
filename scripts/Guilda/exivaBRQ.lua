@@ -17,9 +17,9 @@ if type(storage[panelName]) ~= "table" then
             mostrarMiniBattle = true
         },
         teclas = {
-            target = "Home",
-            team = "End",
-            cancelar = "NumLock"
+            target = "",
+            team = "",
+            cancelar = ""
         },
         posicaoMestre = { x = 300, y = 200 },
         posicaoBattle = { x = 300, y = 150 }
