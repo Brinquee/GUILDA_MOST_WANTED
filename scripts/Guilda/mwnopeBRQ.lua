@@ -25,7 +25,7 @@ if not config.runeIdMwall then config.runeIdMwall = 3180 end
 if not config.runeIdMato then config.runeIdMato = 3156 end
 if not config.squaresThreshold then config.squaresThreshold = 2 end
 if not config.delayTargetMw then config.delayTargetMw = 100 end
-if not config.hotkeyMudarModo then config.hotkeyMudarModo = "F6" end
+if not config.hotkeyMudarModo then config.hotkeyMudarModo = "" end
 
 -- Inicializadores de memoria de posicao X e Y salvos no storage do vBot
 if not config.painelStatusX then config.painelStatusX = 200 end
