@@ -577,7 +577,7 @@ local MAPA_MACROS_GUILDA = {
     -- MACROS DA AUTOMATICO GUILDA (WAR)
     -- ==========================================
 
-	{ nome = "PUSHE BRQ",          key = "3pusheBRQ",          cat = "WAR",         url = "https://raw.githubusercontent.com/zedojavascripts/javaserver/refs/heads/main/scripts/sv_ilusion/war/pushmouse-obfuscated.lua" },
+	{ nome = "PUSHE BRQ",          key = "pusheBRQ",          cat = "WAR",         url = "https://raw.githubusercontent.com/zedojavascripts/javaserver/refs/heads/main/scripts/sv_ilusion/war/pushmouse-obfuscated.lua" },
     { nome = "3 PUSHE BRQ",          key = "3pusheBRQ",          cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/3pusheBRQ.lua" },
 	{ nome = "Central de Icones BRQ",          key = "centralicones",          cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/AttackIcons.lua" },
     { nome = "ANTPUSHE MOUSE-PE BRQ", key = "antpushemousepeBRQ", cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Dropar_item_na_posicao_do_mouseBRQ.lua" },
