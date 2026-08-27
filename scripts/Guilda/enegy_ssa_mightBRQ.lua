@@ -1,3 +1,7 @@
+-- =============================================================================
+-- [SOULE DEFENSE SYSTEMS V1.0] - DEFESA MASTER ORIGINAL: PARTE 1 DE 3 (MANA FIX)
+-- =============================================================================
+
 setDefaultTab("hp")
 UI.Separator()
 
@@ -123,7 +127,7 @@ if not storage[panelName] or not storage[panelName].bpConfigs then
         ssaBagId = 0,
         energyBagId = 0,
         hpEquip = 50,
-        hpMight = 75,
+        hpMight = 75, -- Agora vai agir como a porcentagem maxima de Mana
         hpSSA = 60,
         useSSA = false,
         bpConfigs = {
@@ -134,38 +138,31 @@ if not storage[panelName] or not storage[panelName].bpConfigs then
     }
 end
 local s = storage[panelName]
-
 local defMasterCooldowns = {}
 
--- Funcao auxiliar para achar o item dentro de uma BP especifica
-local function findItemInContainer(itemId, containerId)
+function findItemInContainer(itemId, containerId)
     if itemId <= 0 then return nil end
     for _, container in pairs(g_game.getContainers()) do
         if containerId == 0 or container:getContainerItem():getId() == containerId then
             for _, item in pairs(container:getItems()) do
-                if item:getId() == itemId then 
-                    return item 
-                end
+                if item:getId() == itemId then return item end
             end
         end
     end
     return nil
 end
 
--- Funcao auxiliar para obter o objeto do container pelo ID do item da BP
-local function getContainerByItemId(bagId)
+function getContainerByItemId(bagId)
     if bagId <= 0 then return nil end
     for _, container in pairs(g_game.getContainers()) do
         local containerItem = container:getContainerItem()
-        if containerItem and containerItem:getId() == bagId then
-            return container
-        end
+        if containerItem and containerItem:getId() == bagId then return container end
     end
     return nil
 end
 
 -- =================================================================
---  3. INTERFACE PRINCIPAL (Painel Lateral)
+--  3. INTERFACE PRINCIPAL (Painel Lateral HP NATIVO)
 -- =================================================================
 local ui = setupUI([[
 Panel
@@ -198,15 +195,17 @@ Panel
     text: BP Settings
     color: #FFA500
 ]], parent)
+-- =============================================================================
+-- [SOULE DEFENSE SYSTEMS V1.0] - DEFESA MASTER ORIGINAL: PARTE 2 DE 3
+-- =============================================================================
 
--- Janela de Configuracoes Principal (HP / Itens)
+-- Janela de Configurações Principal Original (HP / Itens)
 local configWindow = setupUI([[
 MainWindow
-  text: Configuracoes de Defesa
+  text: Public Defense Settings
   size: 540 340
   @onEscape: self:hide()
 
-  -- COLUNA ESQUERDA: ANEIS
   Label
     id: t1
     text: --- ANEIS ---
@@ -252,7 +251,7 @@ MainWindow
 
   Label
     id: lblM
-    text: HP Might: 75
+    text: MP Might: 75
     anchors.top: scrollE.bottom
     anchors.left: parent.left
     margin-top: 8
@@ -267,7 +266,6 @@ MainWindow
     maximum: 100
     step: 1
 
-  -- COLUNA DIREITA: AMULETOS
   Label
     id: t2
     text: --- AMULETOS ---
@@ -317,7 +315,6 @@ MainWindow
     maximum: 100
     step: 1
 
-  -- SECAO INFERIOR: BACKPACKS
   Label
     id: t3
     text: --- CONFIGURACAO DE BAGS ---
@@ -409,9 +406,6 @@ end
 bpSettingsWindow:setHeight(450)
 bpSettingsWindow:setWidth(400)
 
--- =================================================================
---  4. MONTAGEM DINAMICA DO PAINEL
--- =================================================================
 local leftPanel = bpSettingsWindow.content.left
 
 local addSwitch = function(id, title, defaultValue, dest, configField)
@@ -462,14 +456,13 @@ end
 macro(100, "Defesa Master", function()
     if not s.enabled then return end
     local hp = hppercent()
+    local mp = manapercent() -- FIX CIRÚRGICO: Puxa a porcentagem real de Mana do boneco
     local now = os.time()
 
-    -- Trava Anti-Spam de abertura inicial
     local function checkAndOpenBag(bagId, itemId)
         if bagId and bagId > 0 then
             if getContainerByItemId(bagId) then return end
             if itemId and itemId > 0 and findItemInContainer(itemId, 0) then return end
-
             if defMasterCooldowns[bagId] and (now - defMasterCooldowns[bagId] < 2) then return end
 
             local bagItem = findItemInContainer(bagId, s.mainBagId)
@@ -481,7 +474,6 @@ macro(100, "Defesa Master", function()
         end
     end
 
-    -- LOGICA DA BP PRINCIPAL
     if s.mainBagId and s.mainBagId > 0 then
         if not getContainerByItemId(s.mainBagId) then
             if not defMasterCooldowns[s.mainBagId] or (now - defMasterCooldowns[s.mainBagId] >= 2) then
@@ -496,7 +488,6 @@ macro(100, "Defesa Master", function()
     checkAndOpenBag(s.energyBagId, s.ringEquipId)
     checkAndOpenBag(s.ssaBagId, s.ssaId)
 
-    -- REGRAS DAS CONFIGURACOES DE BAGS
     local bpMapping = { s.ringBagId, s.energyBagId, s.ssaBagId }
     
     for i = 1, 3 do
@@ -506,7 +497,6 @@ macro(100, "Defesa Master", function()
         if actualBagId and actualBagId > 0 and bpRule.targetItem > 0 then
             local container = getContainerByItemId(actualBagId)
             if container then
-                -- CORRECAO INFALIVEL: Abre a proxima mochila e FECHA a janela vazia antiga no mesmo instante
                 if bpRule.autoOpen then
                     local itemCount = 0
                     for _, item in pairs(container:getItems()) do
@@ -519,11 +509,8 @@ macro(100, "Defesa Master", function()
                             if item:isContainer() then
                                 local internalId = item:getId()
                                 if not defMasterCooldowns[internalId] or (now - defMasterCooldowns[internalId] >= 2) then
-                                    -- 1. Abre a mochila de refil interna
                                     g_game.use(item)
-                                    -- 2. Fecha o container velho que ficou vazio para nao acumular abas na tela
                                     g_game.close(container)
-                                    
                                     defMasterCooldowns[internalId] = now
                                     delay(600)
                                 end
@@ -547,8 +534,11 @@ macro(100, "Defesa Master", function()
             end
         end
     end
+-- =============================================================================
+-- [SOULE DEFENSE SYSTEMS V1.0] - DEFESA MASTER ORIGINAL: PARTE 3 DE 3 (FINAL CORE)
+-- =============================================================================
 
-    -- FUNCAO DE AUTO-ORGANIZACAO
+    -- FUNÇÃO DE AUTO-ORGANIZAÇÃO ORIGINAL
     local function organizeItems(itemId, targetBagId)
         if itemId <= 0 or s.mainBagId <= 0 then return end
         
@@ -612,7 +602,7 @@ macro(100, "Defesa Master", function()
         end
     end
 
-    -- LOGICA DE EQUIPAR ANEIS DIRETO DE SUAS RESPECTIVAS BPs
+    -- 🎯 LOGICA DE EQUIPAR ANEIS CORRIGIDA (Might Ring focado em Mana!)
     local currentRing = getFinger()
     local targetRing = s.ringDeffId
     local targetBag = s.mainBagId 
@@ -620,7 +610,7 @@ macro(100, "Defesa Master", function()
     if hp <= s.hpEquip then
         targetRing = s.ringEquipId
         targetBag = s.energyBagId 
-    elseif hp <= s.hpMight then
+    elseif mp <= s.hpMight then -- MUDANÇA CRÍTICA: Agora o Might Ring lê a Mana Percent!
         targetRing = s.ringMightId
         targetBag = s.ringBagId 
     end
@@ -632,7 +622,7 @@ macro(100, "Defesa Master", function()
 end)
 
 -- =================================================================
---  6. CONEXOES DE ACIONAMENTO DA UI
+--  6. CONEXOES DE ACIONAMENTO DA UI ORIGINAL
 -- =================================================================
 ui.title:setOn(s.enabled)
 ui.title.onClick = function(w)
@@ -641,15 +631,11 @@ ui.title.onClick = function(w)
 end
 
 ui.edit.onClick = function()
-    configWindow:show()
-    configWindow:raise()
-    configWindow:focus()
+    configWindow:show() configWindow:raise() configWindow:focus()
 end
 
 ui.bpSettings.onClick = function()
-    bpSettingsWindow:show()
-    bpSettingsWindow:raise()
-    bpSettingsWindow:focus()
+    bpSettingsWindow:show() bpSettingsWindow:raise() bpSettingsWindow:focus()
 end
 
 configWindow.rSlots.r1:setItemId(s.ringEquipId)
@@ -679,9 +665,10 @@ configWindow.scrollE.onValueChange = function(w, v)
 end
 configWindow.scrollE:setValue(s.hpEquip)
 
+-- 🎯 SINCRO VISUAL CORRIGIDA: Atualiza o texto do painel para refletir a leitura de Mana
 configWindow.scrollM.onValueChange = function(w, v)
     s.hpMight = v
-    configWindow.lblM:setText("HP Might: " .. v)
+    configWindow.lblM:setText("MP Might: " .. v .. "%")
 end
 configWindow.scrollM:setValue(s.hpMight)
 
