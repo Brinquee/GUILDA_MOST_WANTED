@@ -1,5 +1,5 @@
 -- =============================================================================
--- [SOULE DEFENSE SYSTEMS V12.2] - PAINEL LADO A LADO (120PX): PARTE 1 DE 2
+-- [SOULE DEFENSE SYSTEMS V13.0] - MODOS DINÂMICOS (HP/MP): PARTE 1 DE 3
 -- =============================================================================
 
 setDefaultTab("hp")
@@ -54,7 +54,7 @@ DefMasterBPTitle < UIWidget
   font: verdana-11px-rounded
 
 DefMasterBPWindow < MainWindow
-  !text: tr('Defesa Master - Universal BP Settings')
+  !text: tr('CONFIGURACAO DAS BOLSAS')
   padding: 25
 
   VerticalScrollBar
@@ -107,8 +107,8 @@ DefMasterBPWindow < MainWindow
     margin-right: 5
 ]])
 
--- 2. CONFIGURAÇÕES, STORAGE E GERENCIADORES LOCAIS
-local panelName = "Enegy_SSA_PinosDuplos_V12"
+-- 2. CONFIGURAÇÕES, STORAGE COM GATILHOS DE MODO (HP/MP SELECTION)
+local panelName = "Enegy_SSA_PinosDuplos_V13"
 
 if not storage[panelName] or not storage[panelName].bpConfigs then
     storage[panelName] = {
@@ -131,9 +131,15 @@ if not storage[panelName] or not storage[panelName].bpConfigs then
         ssaStart = 60,     
         
         useSSA = false,
+        
+        -- Injeção das chaves de modo (false = HP, true = MP)
+        energyModeMP = false,
+        mightModeMP = true,   -- SLOOT DOIS Ring inicia na Mana por padrão
+        ssaModeMP = false,
+
         bpConfigs = {
-            { name = "BP MIGHT", autoOpen = true, keepSlotFree = false, targetItem = 3048 },
-            { name = "BP ENERGY", autoOpen = true, keepSlotFree = false, targetItem = 3051 },
+            { name = "BP SLOOT DOIS", autoOpen = true, keepSlotFree = false, targetItem = 3048 },
+            { name = "BP SLOOT UM", autoOpen = true, keepSlotFree = false, targetItem = 3051 },
             { name = "BP SSA", autoOpen = true, keepSlotFree = false, targetItem = 3081 }
         }
     }
@@ -162,7 +168,7 @@ function getContainerByItemId(bagId)
     return nil
 end
 
--- 3. INTERFACE PRINCIPAL (Painel Lateral HP NATIVO)
+-- 3. INTERFACE PRINCIPAL (Painel Lateral)
 local ui = setupUI([[
 Panel
   height: 40
@@ -173,7 +179,7 @@ Panel
     anchors.left: parent.left
     text-align: center
     width: 125
-    text: Defesa Master
+    text: EQUIPE ITEM
 
   Button
     id: edit
@@ -191,21 +197,24 @@ Panel
     anchors.right: parent.right
     margin-top: 3
     height: 17
-    text: BP Settings
+    text: Config-Bolsa
     color: #FFA500
 ]], parent)
+-- =============================================================================
+-- [SOULE DEFENSE SYSTEMS V13.0] - MODOS DINÂMICOS (HP/MP): PARTE 2 DE 3
+-- =============================================================================
 
--- 4. JANELA DE CONFIGURAÇÕES COMPACTA: BARRAS LADO A LADO DE 120PX
+-- 4. JANELA DE CONFIGURAÇÕES ORIGINAL REDESENHADA COM CHECKBOX DE SELEÇÃO HP/MP
 local configWindow = setupUI([[
 MainWindow
-  text: Public Defense Settings (Range 120px)
-  size: 540 350
+  text: BRINQUE SCRIPT ( CENTRAL DE EQUIPE )
+  size: 540 320
   @onEscape: self:hide()
 
   -- COLUNA ESQUERDA: ANEIS
   Label
     id: t1
-    text: --- SLOT HP | SLOT MP | SLOT PADRAO ---
+    text: - SLOT UM | SLOT DOIS | SLLOT PADRAO -
     anchors.top: parent.top
     anchors.left: parent.left
     width: 245
@@ -229,11 +238,19 @@ MainWindow
     BotItem
       id: r2
 
-  -- ENERGY RING: BARRAS LADO A LADO DE 120PX (ESQUERDA PARAR / DIREITA PUXAR)
+  -- SLOOT UM RING: SELEÇÃO HP/MP E PINOS LADO A LADO
+  CheckBox
+    id: toggleEnergyMP
+    text: Usar Mana (MP) no SLOOT UM
+    anchors.top: rSlots.bottom
+    anchors.left: parent.left
+    width: 245
+    margin-top: 8
+
   Label
     id: lblE_Stop
     text: Stop HP: 15%
-    anchors.top: rSlots.bottom
+    anchors.top: toggleEnergyMP.bottom
     anchors.left: parent.left
     width: 120
     margin-top: 8
@@ -242,7 +259,7 @@ MainWindow
   Label
     id: lblE_Start
     text: Start HP: 50%
-    anchors.top: rSlots.bottom
+    anchors.top: toggleEnergyMP.bottom
     anchors.left: lblE_Stop.right
     width: 120
     margin-top: 8
@@ -270,23 +287,31 @@ MainWindow
     maximum: 100
     step: 1
 
-  -- MIGHT RING: BARRAS LADO A LADO DE 120PX (ESQUERDA PARAR / DIREITA PUXAR)
+  -- SLOOT DOIS RING: SELEÇÃO HP/MP E PINOS LADO A LADO
+  CheckBox
+    id: toggleMightMP
+    text: Usar Mana (MP) no SLOOT DOIS
+    anchors.top: scrollE_Stop.bottom
+    anchors.left: parent.left
+    width: 245
+    margin-top: 10
+
   Label
     id: lblM_Stop
     text: Stop MP: 20%
-    anchors.top: scrollE_Stop.bottom
+    anchors.top: toggleMightMP.bottom
     anchors.left: parent.left
     width: 120
-    margin-top: 10
+    margin-top: 8
     color: #ff6666
 
   Label
     id: lblM_Start
     text: Start MP: 75%
-    anchors.top: scrollE_Start.bottom
+    anchors.top: toggleMightMP.bottom
     anchors.left: lblM_Stop.right
     width: 120
-    margin-top: 10
+    margin-top: 8
     margin-left: 5
     color: #66ff66
 
@@ -315,7 +340,7 @@ MainWindow
   -- COLUNA DIREITA: AMULETOS (SSA)
   Label
     id: t2
-    text: --- SLOT HP | SLOT PADRAO ---
+    text: --- AMULETO | AMULETO PADRAO ---
     anchors.top: parent.top
     anchors.right: parent.right
     width: 245
@@ -331,7 +356,7 @@ MainWindow
     margin-top: 5
     layout:
       type: horizontalBox
-      spacing: 30
+      spacing: 65
     BotItem
       id: ssa
     BotItem
@@ -343,13 +368,21 @@ MainWindow
     anchors.top: sSlots.bottom
     anchors.left: sSlots.left
     width: 245
-    margin-top: 10
+    margin-top: 8
 
-  -- SSA: BARRAS LADO A LADO DE 120PX (ESQUERDA PARAR / DIREITA PUXAR)
+  -- SSA: SELEÇÃO HP/MP E PINOS LADO A LADO
+  CheckBox
+    id: toggleSSAMP
+    text: Usar Mana (MP) no SSA
+    anchors.top: toggleSSA.bottom
+    anchors.left: sSlots.left
+    width: 245
+    margin-top: 8
+
   Label
     id: lblS_Stop
     text: Stop HP: 10%
-    anchors.top: toggleSSA.bottom
+    anchors.top: toggleSSAMP.bottom
     anchors.left: sSlots.left
     width: 120
     margin-top: 8
@@ -358,7 +391,7 @@ MainWindow
   Label
     id: lblS_Start
     text: Start HP: 60%
-    anchors.top: toggleSSA.bottom
+    anchors.top: toggleSSAMP.bottom
     anchors.left: lblS_Stop.right
     width: 120
     margin-top: 8
@@ -430,7 +463,7 @@ MainWindow
         type: horizontalBox
         spacing: 3
       Label
-        text: BP MIGHT:
+        text: BP SLOOT DOIS:
         margin-top: 10
       BotItem
         id: rBag
@@ -443,7 +476,7 @@ MainWindow
         type: horizontalBox
         spacing: 3
       Label
-        text: BP ENERGY:
+        text: BP SLOOT UM:
         margin-top: 10
       BotItem
         id: eBag
@@ -470,9 +503,6 @@ MainWindow
     height: 22
 ]], g_ui.getRootWidget())
 configWindow:hide()
--- =============================================================================
--- [SOULE DEFENSE SYSTEMS V12.2] - PAINEL LADO A LADO: PARTE 2 DE 2 (LETRA A)
--- =============================================================================
 
 local bpSettingsWindow = UI.createWindow('DefMasterBPWindow', rootWidget)
 bpSettingsWindow:hide()
@@ -525,11 +555,14 @@ for i = 1, 3 do
     addSwitch(i, "Manter Slot Livre", bpData.keepSlotFree, leftPanel, "keepSlotFree")
     addItemEdit(i, "Item para Monitorar/Drop", bpData.targetItem, leftPanel, "targetItem")
 end
+-- =============================================================================
+-- [SOULE DEFENSE SYSTEMS V13.0] - MODOS DINÂMICOS (HP/MP): PARTE 3 DE 3 (LETRA A)
+-- =============================================================================
 
 -- =================================================================
--- 5. MOTOR CENTRAL DE COMBATE COM AS CONDICIONAIS DE RANGE COMPACTO
+-- 5. MOTOR CENTRAL DE COMBATE INTELIGENTE (HP / MP SELECTOR)
 -- =================================================================
-macro(100, "Defesa Master", function()
+macro(100, "BOLSAS", function()
     if not s.enabled then return end
     local hp = hppercent()
     local mp = manapercent()
@@ -651,7 +684,7 @@ macro(100, "Defesa Master", function()
         end
     end
 -- =============================================================================
--- [SOULE DEFENSE SYSTEMS V12.2] - PAINEL LADO A LADO: PARTE 2 DE 2 (LETRA B)
+-- [SOULE DEFENSE SYSTEMS V13.0] - MODOS DINÂMICOS (HP/MP): PARTE 3 DE 3 (LETRA B)
 -- =============================================================================
 
     organizeItems(s.ringDeffId, 0)
@@ -660,11 +693,12 @@ macro(100, "Defesa Master", function()
     organizeItems(s.ringEquipId, s.energyBagId) 
     organizeItems(s.ssaId, s.ssaBagId)         
 
+    -- 🎯 GATILHO COMPACTO DO AMULETO (SSA): Valida modo HP ou modo MP dinamicamente
     local currentNeck = getNeck()
     local usarAmuletAgora = false
+    local ssaValorChecagem = s.ssaModeMP and mp or hp
 
-    -- Só ativa o SSA se o HP estiver no intervalo correto (Abaixo do Puxar E Acima do Parar)
-    if s.useSSA and hp <= (s.ssaStart or 60) and hp > (s.ssaStop or 10) then
+    if s.useSSA and ssaValorChecagem <= (s.ssaStart or 60) and ssaValorChecagem > (s.ssaStop or 10) then
         usarAmuletAgora = true
     end
 
@@ -680,16 +714,18 @@ macro(100, "Defesa Master", function()
         end
     end
 
+    -- 🎯 GATILHO COMPACTO DOS ANÉIS: Valida modo HP ou modo MP dinamicamente para cada slot
     local currentRing = getFinger()
     local targetRing = s.ringDeffId
     local targetBag = s.mainBagId 
 
-    -- 1. ENERGY RING: Verifica se o HP está no intervalo (Abaixo do Puxar E Acima do Parar)
-    if hp <= (s.energyStart or 50) and hp > (s.energyStop or 15) then
+    local energyValorChecagem = s.energyModeMP and mp or hp
+    local mightValorChecagem = s.mightModeMP and mp or hp
+
+    if energyValorChecagem <= (s.energyStart or 50) and energyValorChecagem > (s.energyStop or 15) then
         targetRing = s.ringEquipId
         targetBag = s.energyBagId 
-    -- 2. MIGHT RING: Verifica se a MANA está no intervalo (Abaixo do Puxar E Acima do Parar)
-    elseif mp <= (s.mightStart or 75) and mp > (s.mightStop or 20) then
+    elseif mightValorChecagem <= (s.mightStart or 75) and mightValorChecagem > (s.mightStop or 20) then
         targetRing = s.ringMightId
         targetBag = s.ringBagId 
     end
@@ -701,7 +737,7 @@ macro(100, "Defesa Master", function()
 end)
 
 -- =================================================================
--- 6. CONEXOES DE ACIONAMENTO DA UI COMPACTA LADO A LADO
+-- 6. CONEXOES DE ACIONAMENTO DA UI COMPACTA E EVENTOS LUA
 -- =================================================================
 ui.title:setOn(s.enabled)
 ui.title.onClick = function(w)
@@ -738,35 +774,63 @@ configWindow.bagPanel.energyBagPanel.eBag.onItemChange = function(w) s.energyBag
 configWindow.bagPanel.rightBagPanel.sBag:setItemId(s.ssaBagId)
 configWindow.bagPanel.rightBagPanel.sBag.onItemChange = function(w) s.ssaBagId = w:getItemId() end
 
--- EVENTOS DE VALOR PARA AS BARRAS EMPARELHADAS EM LUA NATIVO
+-- EVENTOS DE VALOR PARA OS SCROLLBARS LADO A LADO
 configWindow.scrollE_Stop.onValueChange = function(w, v)
     s.energyStop = tonumber(v) or 15
-    configWindow.lblE_Stop:setText("Stop HP: " .. s.energyStop .. "%")
+    local sufixo = s.energyModeMP and "MP" or "HP"
+    configWindow.lblE_Stop:setText("Stop " .. sufixo .. ": " .. s.energyStop .. "%")
 end
 configWindow.scrollE_Start.onValueChange = function(w, v)
     s.energyStart = tonumber(v) or 50
-    configWindow.lblE_Start:setText("Start HP: " .. s.energyStart .. "%")
+    local sufixo = s.energyModeMP and "MP" or "HP"
+    configWindow.lblE_Start:setText("Start " .. sufixo .. ": " .. s.energyStart .. "%")
 end
 
 configWindow.scrollM_Stop.onValueChange = function(w, v)
     s.mightStop = tonumber(v) or 20
-    configWindow.lblM_Stop:setText("Stop MP: " .. s.mightStop .. "%")
+    local sufixo = s.mightModeMP and "MP" or "HP"
+    configWindow.lblM_Stop:setText("Stop " .. sufixo .. ": " .. s.mightStop .. "%")
 end
 configWindow.scrollM_Start.onValueChange = function(w, v)
     s.mightStart = tonumber(v) or 75
-    configWindow.lblM_Start:setText("Start MP: " .. s.mightStart .. "%")
+    local sufixo = s.mightModeMP and "MP" or "HP"
+    configWindow.lblM_Start:setText("Start " .. sufixo .. ": " .. s.mightStart .. "%")
 end
 
 configWindow.scrollS_Stop.onValueChange = function(w, v)
     s.ssaStop = tonumber(v) or 10
-    configWindow.lblS_Stop:setText("Stop HP: " .. s.ssaStop .. "%")
+    local sufixo = s.ssaModeMP and "MP" or "HP"
+    configWindow.lblS_Stop:setText("Stop " .. sufixo .. ": " .. s.ssaStop .. "%")
 end
 configWindow.scrollS_Start.onValueChange = function(w, v)
     s.ssaStart = tonumber(v) or 60
-    configWindow.lblS_Start:setText("Start HP: " .. s.ssaStart .. "%")
+    local sufixo = s.ssaModeMP and "MP" or "HP"
+    configWindow.lblS_Start:setText("Start " .. sufixo .. ": " .. s.ssaStart .. "%")
 end
 
--- Cravamento mecânico inicial sincronizado sem lags de inicialização
+-- VÍNCULO E ATUALIZADORES DAS CAIXAS DE SELEÇÃO DINÂMICAS DE MODO (HP/MP)
+configWindow.toggleEnergyMP:setChecked(s.energyModeMP)
+configWindow.toggleEnergyMP.onCheckChange = function(w, c)
+    s.energyModeMP = c
+    configWindow.scrollE_Stop:onValueChange(configWindow.scrollE_Stop:getValue())
+    configWindow.scrollE_Start:onValueChange(configWindow.scrollE_Start:getValue())
+end
+
+configWindow.toggleMightMP:setChecked(s.mightModeMP)
+configWindow.toggleMightMP.onCheckChange = function(w, c)
+    s.mightModeMP = c
+    configWindow.scrollM_Stop:onValueChange(configWindow.scrollM_Stop:getValue())
+    configWindow.scrollM_Start:onValueChange(configWindow.scrollM_Start:getValue())
+end
+
+configWindow.toggleSSAMP:setChecked(s.ssaModeMP)
+configWindow.toggleSSAMP.onCheckChange = function(w, c)
+    s.ssaModeMP = c
+    configWindow.scrollS_Stop:onValueChange(configWindow.scrollS_Stop:getValue())
+    configWindow.scrollS_Start:onValueChange(configWindow.scrollS_Start:getValue())
+end
+
+-- Cravamento inicial dos eixos deslizantes
 configWindow.scrollE_Stop:setValue(s.energyStop or 15)
 configWindow.scrollE_Start:setValue(s.energyStart or 50)
 configWindow.scrollM_Stop:setValue(s.mightStop or 20)
