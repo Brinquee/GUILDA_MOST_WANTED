@@ -437,3 +437,95 @@ setPot(storage.potions_enabled)
 updateUI()
 
 UI.Separator()
+
+
+
+-- =============================================================================
+-- [BRINQUE SCRIPTS] MACRO DE AVISO OBRIGATÓRIO DE MIGRAÇÃO V2.0 - PARTE 1 DE 2
+-- =============================================================================
+
+local widgetRaizDoJogo = g_ui.getRootWidget()
+local painelAvisoVelho = widgetRaizDoJogo:recursiveGetChildById("janelaAvisoMigracaoV2")
+if painelAvisoVelho then painelAvisoVelho:destroy() end
+
+local LINK_SUPORTE_WHATSAPP = "https://chat.whatsapp.com/D4WHVuAy41t6uQ6QZ3ibtR"
+
+-- 🛠️ CORREÇÃO SUPREMA: Âncoras separadas linha por linha e removido os comentários internos
+local designAvisoOTUI = "UIWindow\n" ..
+"  id: janelaAvisoMigracaoV2\n" ..
+"  size: 1000 300\n" ..
+"  anchors.horizontalCenter: parent.horizontalCenter\n" ..
+"  anchors.verticalCenter: parent.verticalCenter\n" ..
+"  clipping: true\n" ..
+"  padding: 15\n" ..
+"  layout: anchor\n" ..
+"\n" ..
+"  Panel\n" ..
+"    background-color: #000000D5\n" ..
+"    anchors.fill: parent\n" ..
+"    margin: 0\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblTituloAviso\n" ..
+"    text: !!! ALERTA DE ATUALIZACAO EM 1 MINUTO O PAINEL SAI!!!\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ff4444\n" ..
+"    anchors.top: parent.top\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 10\n" ..
+"    text-align: center\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblCorpoAviso\n" ..
+"    text: Comunicamos Que Esta versao 2.0 sera DESATIVADA. Por favor, entre em contato com a administracao Pelo link Não fique sem as Suas scripts!\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    anchors.top: lblTituloAviso.bottom\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 15\n" ..
+"    text-align: center\n" ..
+"\n" ..
+"  Button\n" ..
+"    id: btnFalarSuporte\n" ..
+"    text: FALAR COM A ADMINISTRACAO\n" ..
+"    color: #00ff00\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    image-source: /bot/BRINQUE/imagens/BOTAO.png\n" ..
+"    image-smooth: true\n" ..
+"    image-border: 5\n" ..
+"    anchors.bottom: parent.bottom\n" ..
+"    anchors.horizontalCenter: parent.horizontalCenter\n" ..
+"    margin-bottom: 10\n" ..
+"    size: 260 26\n"
+
+janelaAvisoMestre = setupUI(designAvisoOTUI, widgetRaizDoJogo)
+janelaAvisoMestre:show()
+janelaAvisoMestre:raise()
+janelaAvisoMestre:focus()
+-- =============================================================================
+-- [BRINQUE SCRIPTS] MACRO DE AVISO OBRIGATÓRIO DE MIGRAÇÃO V2.0 - PARTE 2 DE 2
+-- =============================================================================
+
+-- Vincula a ação de clique para abrir o WhatsApp de suporte do administrador
+janelaAvisoMestre.btnFalarSuporte.onClick = function()
+    if g_signals and g_signals.openUrl then 
+        g_signals.openUrl(LINK_SUPORTE_WHATSAPP)
+    elseif g_platform and g_platform.openUrl then 
+        g_platform.openUrl(LINK_SUPORTE_WHATSAPP)
+    else 
+        print(">>> [BRINQUE] Acesse o suporte pelo link: " .. LINK_SUPORTE_WHATSAPP) 
+    end
+end
+
+-- 🧠 TEMPORIZADOR DE MIGRACAO: Conta exatamente 1 minuto (60000ms) e fecha o painel
+schedule(60000, function()
+    -- Procura o modal ativo diretamente pelo ID na raiz gráfica para evitar vazamentos de memória
+    local widgetAlvoParaFechar = g_ui.getRootWidget():recursiveGetChildById("janelaAvisoMigracaoV2")
+    if widgetAlvoParaFechar then
+        widgetAlvoParaFechar:destroy()
+        print("[Brinque] O painel de aviso foi fechado automaticamente apos 1 minuto.")
+    end
+end)
