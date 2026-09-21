@@ -1,785 +1,531 @@
-setDefaultTab("GUILD")
+setDefaultTab("HP") -- Garante que os créditos apareçam na aba HP do Healer
 
-local panelName = "painelBrinqueScripts"
-if type(storage[panelName]) ~= "table" then
-    storage[panelName] = {
-        height = 140,
-        macrosMarcados = {
-            antipush = true, configs = true, potguild = true, filtro = true,
-            rainbow = true, skills = true, bola = true, combo = true,
-            energyssa = true, stamina = true, healing = true, exiva = true,
-            magias = true, fps = true, abrirbag = true
-        }
-    }
+-- =============================================================================
+-- [PAINEL DE CRÉDITOS E SUPORTE - BRINQUE SCRIPT NATIVO ANIMADO]
+-- =============================================================================
+local version = "2.1"
+local currentVersion
+local available = false
+
+storage.checkVersion = storage.checkVersion or 0
+
+-- 1. Rótulo Principal: Nome da Marca Destacado em Amarelo Ouro Original
+local labelBrinqueMarca = UI.Label("HEALING BRINQUE v" .. version)
+if labelBrinqueMarca then
+    labelBrinqueMarca:setColor("#ffcc00") -- Cor Ouro de Elite
+    labelBrinqueMarca:setFont("verdana-11px-rounded") -- Fonte com contorno limpo
 end
 
-local config = storage[panelName]
+
 
 -- =============================================================================
--- [PARTE 1 DE 6] BANCO DE DADOS FECHADO E DIRETÓRIO - BRINQUE SCRIPTS
+-- [MOTOR DE PISCAR SIMPLES] DEGRADE CONTÍNUO EM LOOP DE BACKGROUND (SEM CRASH)
 -- =============================================================================
-local LINK_RENOVACAO = "https://wa.me/qr/QHQWPAJNPYRDJ1" -- Seu link de atendimento
-local pastaImg = "/bot/CUSTOM_PREMIUM/imagens/"
+macro(150, function()
+    if not labelBrinqueMarca then return end
 
--- BANCO DE DADOS DE CLIENTES RIGIDO (Apenas IDs autorizados entram no bot)
-local BANCO_DADOS_CLIENTES = {
-    -- Substitua pelo seu ID definitivo "BRINQUE-GLOBAL-XXXXXXXX" que chegar no seu Discord
-    ["BRINQUE-GLOBAL-8405406"] = {
-        nome = "Dono Brinque Scripts",
-        compra = "01/08/2026",
-        vence = "ilimitado"
-    },
-    ["BRINQUE-GLOBAL-11111111"] = {
-        nome = "Patrocinador Oficial",
-        compra = "01/08/2026",
-        vence = "ilimitado"
-    },
-	
-	["BRINQUE-GLOBAL-45525429"] = {
-        nome = "Marcos",
-        compra = "11/08/2026",
-        vence = "12/09/2026"
-    },
-	
-    ["BRINQUE-GLOBAL-73518479"] = {
-        nome = "Luiz Henrique",
-        compra = "11/08/2026",
-        vence = "12/09/2026"
-    },
-	    ["BRINQUE-GLOBAL-8481060"] = {
-        nome = "Kyan Rodrigo",
-        compra = "11/08/2026",
-        vence = "12/09/2026"
-    },
-		    ["BRINQUE-GLOBAL-53228478"] = {
-        nome = "Adriiano",
-        compra = "11/08/2026",
-        vence = "12/09/2026"
-    },
-		    ["BRINQUE-GLOBAL-38396807"] = {
-        nome = "Matheus",
-        compra = "11/08/2026",
-        vence = "12/09/2026"
-    },
-	
-    ["BRINQUE-GLOBAL-17988101"] = {
-        nome = "Helio",
-        compra = "11/08/2026",
-        vence = "12/09/2026"
-    },
-    ["BRINQUE-GLOBAL-10949865"] = {
-        nome = "Wesley",
-        compra = "11/08/2026",
-        vence = "12/09/2026"
-    }
-}
+    -- Coleta o tempo atual em ondas matemáticas (Seno de frequência rápida)
+    local tempoOnda = os.clock() * 5
+    local pulsoIntensidade = math.abs(math.sin(tempoOnda))
 
-local LINK_INSTAGRAM = "https://www.instagram.com/brinquescriptsgamer?igsh=dXhhN2MxNWhxMm9m"
-local LINK_WHATSAPP  = "https://chat.whatsapp.com/D4WHVuAy41t6uQ6QZ3ibtR"
-local LINK_DISCORD   = "https://discord.gg/BRNzJ7cZjq"
-local LINK_YOUTUBE   = "https://youtube.com"
+    -- 1. FAZ A LOGO "HEALING BRINQUE" PISCAR EM DEGRADÊ (AMARELO OURO <-> LARANJA WAR)
+    local gLogo = math.floor(100 + (105 * pulsoIntensidade)) -- Oscila o tom de Verde do RGB
+    local corLogoHex = string.format("#FF%02X00", gLogo)
+    labelBrinqueMarca:setColor(corLogoHex)
+end)
 
-local script_path = "/scripts_storage/"
--- =============================================================================
--- [PARTE 2 DE 6] STRINGS OTUI ENGENHARIZADAS (JANELAS A E B COM ANCHOR LAYOUT)
--- =============================================================================
+----------
+
+-- TRAVA ANTI-BUG DEFINITIVA: Neutraliza loops fantasmas na memória do client
+if not updateDropUI then function updateDropUI() end end
+if not updateOlheiroUI then function updateOlheiroUI() end end
+
 local widgetRaizDoJogo = g_ui.getRootWidget()
 
--- JANELA A: AVISO DE LICENÇA (PARA CLIENTES ATIVOS COM DIAS)
-local designAvisoLicencaOTUI = "MainWindow\n" ..
-"  id: janelaAvisoLicenca\n" ..
-"  !text: tr('Painel de Acesso - Brinque Scripts')\n" ..
-"  size: 320 200\n" ..
-"  @onEscape: self:hide()\n" ..
-"  background-color: alpha\n" ..
-"  image-border: 0\n" ..
-"  border: 0 alpha\n" ..
-"  padding: 0\n" ..
-"  layout: anchor\n" .. -- Injeção mestre para destravar as âncoras no tema Retro
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoAviso\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/M_custompremium.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.fill: parent\n" ..
-"    phantom: true\n" ..
-"\n" ..
-"  Panel\n" ..
-"    background-color: #00000030\n" ..
-"    anchors.fill: parent\n" ..
-"    phantom: true\n" ..
-"\n" ..
-"  Label\n" ..
-"    id: lblNomeCliente\n" ..
-"    text: Cliente: Carregando...\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ffffff\n" ..
-"    anchors.top: parent.top\n" ..
-"    anchors.left: parent.left\n" ..
-"    margin-top: 15\n" ..
-"    margin-left: 20\n" ..
-"\n" ..
-"  Label\n" ..
-"    id: lblDiasRestantes\n" ..
-"    text: Status do Acesso: Calculando...\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    anchors.top: lblNomeCliente.bottom\n" ..
-"    anchors.left: parent.left\n" ..
-"    margin-top: 12\n" ..
-"    margin-left: 20\n" ..
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoBtnRenovar\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.top: lblDiasRestantes.bottom\n" ..
-"    anchors.left: parent.left\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: -40\n" ..
-"    margin-left: 30\n" ..
-"    margin-right: 30\n" ..
-"    height: 200\n" ..
-"    phantom: true\n" ..
-"  Label\n" ..
-"    id: btnRenovar\n" ..
-"    text: Renovar / Prolongar Dias\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ffffff\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    margin-top: -24\n" ..
-"    phantom: false\n" ..
-"    anchors.fill: imgFundoBtnRenovar\n" ..
-"\n" ..
-"  Button\n" ..
-"    id: closeBtn\n" ..
-"    text: Fechar\n" ..
-"    font: cipsoftFont\n" ..
-"    anchors.bottom: parent.bottom\n" ..
-"    anchors.left: parent.left\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-left: 20\n" ..
-"    margin-right: 20\n" ..
-"    margin-bottom: 8\n" ..
-"    height: 18\n"
+setDefaultTab("HP")
 
--- JANELA B: TELA DE BLOQUEIO PARA QUANDO O MODO LIVRE FOR DESLIGADO NO FUTURO
-local designBloqueioHWIDOTUI = "MainWindow\n" ..
-"  id: janelaBloqueioHWID\n" ..
-"  !text: tr('Acesso Negado - Brinque Scripts')\n" ..
-"  size: 340 230\n" ..
-"  @onEscape: self:hide()\n" ..
-"  background-color: alpha\n" ..
-"  image-border: 0\n" ..
-"  border: 0 alpha\n" ..
-"  padding: 0\n" ..
-"  layout: anchor\n" .. -- Destrava o alinhamento das imagens e caixas de texto
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoBloqueio\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/M_custompremium.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.fill: parent\n" ..
-"    phantom: true\n" ..
-"\n" ..
-"  Panel\n" ..
-"    background-color: #00000040\n" ..
-"    anchors.fill: parent\n" ..
-"    phantom: true\n" ..
-"\n" ..
-"  Label\n" ..
-"    id: lblMsgBloqueio\n" ..
-"    text: Seu computador nao esta registrado!\\nEnvie o codigo abaixo para o Administrador.\\nPara liberar o seu acesso de forma imediata.\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ff4444\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    anchors.top: parent.top\n" ..
-"    anchors.left: parent.left\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: 15\n" ..
-"    margin-left: 10\n" ..
-"    margin-right: 10\n" ..
-"    height: 50\n" ..
-"\n" ..
-"  Label\n" ..
-"    id: lblCodigoPC\n" ..
-"    text: ID DO PC: ...\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #FFD700\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    anchors.top: lblMsgBloqueio.bottom\n" ..
-"    anchors.left: parent.left\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: 15\n" ..
-"    height: 16\n" ..
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoBtnSuporte\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.top: lblCodigoPC.bottom\n" ..
-"    anchors.left: parent.left\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: -20\n" ..
-"    margin-left: 40\n" ..
-"    margin-right: 40\n" ..
-"    height: 200\n" ..
-"    phantom: true\n" ..
-"  Label\n" ..
-"    id: btnFalarAdmin\n" ..
-"    text: Enviar ID para o Suporte\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ffffff\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    margin-top: -23\n" ..
-"    phantom: false\n" ..
-"    anchors.fill: imgFundoBtnSuporte\n"
+storage.healing_master   = storage.healing_master or false
+storage.potions_enabled  = storage.potions_enabled or false
+storage.iconSpellPos     = storage.iconSpellPos or {x=200,y=120}
+storage.iconPotPos       = storage.iconPotPos or {x=260,y=120}
+
 -- =============================================================================
--- [PARTE 3 DE 6] STRING OTUI - PAINEL PRINCIPAL DE MACROS (ANCHOR LAYOUT)
+-- [BLOCO OTUI SUPREMO] BOTÕES DO RODAPÉ EM LINHA DE MONTAGEM (100% IMÓVEIS)
 -- =============================================================================
-local designPrincipalOTUI = "MainWindow\n" ..
-"  id: janelaEscolhaMacros\n" ..
-"  size: 560 380\n" ..
-"  @onEscape: self:hide()\n" ..
-"  background-color: alpha\n" ..
-"  image-border: 0\n" ..
-"  border: 0 alpha\n" ..
-"  padding: 0\n" ..
-"  layout: anchor\n" .. -- Destrava o alinhamento das redes sociais e painéis de rolagem
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoCustomCelestiais\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/M_custompremium.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.fill: parent\n" ..
-"    margin: -5\n" ..
-"    phantom: true\n" ..
-"\n" ..
-"  Panel\n" ..
-"    background-color: #00000025\n" ..
-"    anchors.fill: parent\n" ..
-"    margin: -5\n" ..
-"    phantom: true\n" ..
-"\n" ..
-"  ScrollablePanel\n" ..
-"    id: listaScroll\n" ..
-"    anchors.top: parent.top\n" ..
-"    anchors.left: parent.left\n" ..
-"    anchors.right: barraRolagem.left\n" ..
-"    anchors.bottom: sepInf.top\n" ..
-"    margin-top: 10\n" ..
-"    margin-left: 10\n" ..
-"    margin-right: 2\n" ..
-"    margin-bottom: 5\n" ..
-"    vertical-scrollbar: barraRolagem\n" ..
-"    layout:\n" ..
-"      type: verticalBox\n" ..
-"      spacing: 6\n" ..
-"\n" ..
-"  VerticalScrollBar\n" ..
-"    id: barraRolagem\n" ..
-"    anchors.top: parent.top\n" ..
-"    anchors.bottom: sepInf.top\n" ..
-"    anchors.right: lblRedesTitulo.left\n" ..
-"    margin-top: 10\n" ..
-"    margin-bottom: 5\n" ..
-"    margin-right: 5\n" ..
-"    step: 20\n" ..
-"    pixels-scroll: true\n" ..
-"\n" ..
-"  Label\n" ..
-"    id: lblRedesTitulo\n" ..
-"    text: -- REDES SOCIAIS DA GUILDA --\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #00bfff\n" ..
-"    anchors.top: parent.top\n" ..
-"    anchors.left: parent.horizontalCenter\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: 20\n" ..
-"    margin-left: 15\n" ..
-"    text-align: center\n" ..
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoInsta\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.top: lblRedesTitulo.bottom\n" ..
-"    anchors.left: parent.horizontalCenter\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: -50\n" ..
-"    margin-left: 20\n" ..
-"    margin-right: 15\n" ..
-"    height: 200\n" ..
-"    phantom: true\n" ..
-"  Label\n" ..
-"    id: btnInstagram\n" ..
-"    text: Acessar Instagram\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ffffff\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    margin-top: -13\n" ..
-"    phantom: false\n" ..
-"    anchors.centerIn: imgFundoInsta\n" ..
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoWhats\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.top: imgFundoInsta.bottom\n" ..
-"    anchors.left: parent.horizontalCenter\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: -160\n" ..
-"    margin-left: 20\n" ..
-"    margin-right: 15\n" ..
-"    height: 200\n" ..
-"    phantom: true\n" ..
-"  Label\n" ..
-"    id: btnWhatsApp\n" ..
-"    text: Grupo do WhatsApp\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ffffff\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    margin-top: -13\n" ..
-"    phantom: false\n" ..
-"    anchors.centerIn: imgFundoWhats\n" ..
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoDiscord\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.top: imgFundoWhats.bottom\n" ..
-"    anchors.left: parent.horizontalCenter\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: -160\n" ..
-"    margin-left: 20\n" ..
-"    margin-right: 15\n" ..
-"    height: 200\n" .. 
-"    phantom: true\n" ..
-"  Label\n" ..
-"    id: btnDiscord\n" ..
-"    text: Servidor do Discord\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ffffff\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    margin-top: -13\n" ..
-"    phantom: false\n" ..
-"    anchors.centerIn: imgFundoDiscord\n" ..
-"\n" ..
-"  UIWidget\n" ..
-"    id: imgFundoYoutube\n" ..
-"    image-source: /bot/CUSTOM_PREMIUM/imagens/butaoazulverme.png\n" ..
-"    image-smooth: true\n" ..
-"    image-fixed-ratio: false\n" ..
-"    anchors.top: imgFundoDiscord.bottom\n" ..
-"    anchors.left: parent.horizontalCenter\n" ..
-"    anchors.right: parent.right\n" ..
-"    margin-top: -160\n" ..
-"    margin-left: 20\n" ..
-"    margin-right: 15\n" ..
-"    height: 200\n" ..
-"    phantom: true\n" ..
-"  Label\n" ..
-"    id: btnYouTube\n" ..
-"    text: Canal do YouTube\n" ..
-"    font: verdana-11px-rounded\n" ..
-"    color: #ffffff\n" ..
-"    text-auto-resize: false\n" ..
-"    text-align: center\n" ..
-"    margin-top: -13\n" ..
-"    phantom: false\n" ..
-"    anchors.centerIn: imgFundoYoutube\n" ..
-"\n" ..
-"  HorizontalSeparator\n" ..
-"    id: sepInf\n" ..
-"    anchors.left: parent.left\n" ..
-"    anchors.right: parent.right\n" ..
-"    anchors.bottom: closeBtn.top\n" ..
-"    margin-bottom: 8\n" ..
-"\n" ..
-"  Button\n" ..
-"    id: closeBtn\n" ..
-"    text: Fechar\n" ..
-"    font: cipsoftFont\n" ..
-"    anchors.right: parent.right\n" ..
-"    anchors.bottom: parent.bottom\n" ..
-"    size: 60 20\n" ..
-"    margin-bottom: 5\n" ..
-"    margin-right: 15\n" ..
-"    @onClick: self:getParent():hide()\n"
--- =============================================================================
--- [PARTE 4 DE 6] INICIALIZAÇÃO DE PANÉIS, LINKS E WEBHOOK DISCORD PROTEGIDO
--- =============================================================================
--- 1. FUNÇÃO ANCORADA NO TOPO: Registra a leitura do navegador na memória primeiro
-local function abrirLinkNoNavegadorReal(urlDestino)
-    if g_signals and g_signals.openUrl then g_signals.openUrl(urlDestino)
-    elseif g_platform and g_platform.openUrl then g_platform.openUrl(urlDestino)
-    else print(">>> [BRINQUE] Link para copiar: " .. urlDestino) end
-end
+healerMainWindow = setupUI([[
+MainWindow
+  id: janelaHealerUltimateFlutuante
+  size: 260 410
+  anchors.centerIn: parent
+  draggable: true
+  @onEscape: self:hide()
 
--- 2. DESTRUIÇÃO DE COMPONENTES ANTIGOS DUPLICADOS
-if widgetRaizDoJogo:recursiveGetChildById("janelaAvisoLicenca") then widgetRaizDoJogo:recursiveGetChildById("janelaAvisoLicenca"):destroy() end
-if widgetRaizDoJogo:recursiveGetChildById("janelaBloqueioHWID") then widgetRaizDoJogo:recursiveGetChildById("janelaBloqueioHWID"):destroy() end
-if widgetRaizDoJogo:recursiveGetChildById("janelaEscolhaMacros") then widgetRaizDoJogo:recursiveGetChildById("janelaEscolhaMacros"):destroy() end
-
--- 3. CRIAÇÃO FÍSICA SEGURA DOS COMPONENTES OTUI
-local setupAvisoWindow    = setupUI(designAvisoLicencaOTUI, widgetRaizDoJogo)
-local setupBloqueioWindow = setupUI(designBloqueioHWIDOTUI, widgetRaizDoJogo)
-local setupMacrosWindow   = setupUI(designPrincipalOTUI, widgetRaizDoJogo)
-
-setupAvisoWindow:hide()
-setupBloqueioWindow:hide()
-setupMacrosWindow:hide()
-
--- 4. TRAVA DE IMAGENS FANTASMAS
-if not g_resources.fileExists(pastaImg .. "butaoazulverme.png") then
-    if setupMacrosWindow.imgFundoInsta then setupMacrosWindow.imgFundoInsta:setImageSource("") end
-    if setupMacrosWindow.imgFundoWhats then setupMacrosWindow.imgFundoWhats:setImageSource("") end
-    if setupMacrosWindow.imgFundoDiscord then setupMacrosWindow.imgFundoDiscord:setImageSource("") end
-    if setupMacrosWindow.imgFundoYoutube then setupMacrosWindow.imgFundoYoutube:setImageSource("") end
-    if setupAvisoWindow.imgFundoBtnRenovar then setupAvisoWindow.imgFundoBtnRenovar:setImageSource("") end
-    if setupBloqueioWindow.imgFundoBtnSuporte then setupBloqueioWindow.imgFundoBtnSuporte:setImageSource("") end
-end
-
--- 5. ATRIBUIÇÃO DOS EVENTOS DE CLIQUE (AGORA ENXERGANDO A FUNÇÃO PERFEITAMENTE)
-if setupMacrosWindow.btnInstagram then setupMacrosWindow.btnInstagram.onClick = function() abrirLinkNoNavegadorReal(LINK_INSTAGRAM) end end
-if setupMacrosWindow.btnWhatsApp then setupMacrosWindow.btnWhatsApp.onClick  = function() abrirLinkNoNavegadorReal(LINK_WHATSAPP) end end
-if setupMacrosWindow.btnDiscord then setupMacrosWindow.btnDiscord.onClick   = function() abrirLinkNoNavegadorReal(LINK_DISCORD) end end
-if setupMacrosWindow.btnYouTube then setupMacrosWindow.btnYouTube.onClick   = function() abrirLinkNoNavegadorReal(LINK_YOUTUBE) end end
-
-if setupAvisoWindow.btnRenovar then setupAvisoWindow.btnRenovar.onClick = function() abrirLinkNoNavegadorReal(LINK_RENOVACAO) end end
-if setupAvisoWindow.closeBtn then setupAvisoWindow.closeBtn.onClick   = function() setupAvisoWindow:hide() end end
-if setupBloqueioWindow.btnFalarAdmin then setupBloqueioWindow.btnFalarAdmin.onClick = function() abrirLinkNoNavegadorReal(LINK_RENOVACAO) end end
-
-local uiTravaAba = nil
-local function renderizarBotaoMenuLateral(maquinaValida, mensagemStatus, corStatus)
-    if uiTravaAba then uiTravaAba:destroy() end
-    if maquinaValida then
-        uiTravaAba = setupUI([[
-Panel
-  height: 40
-  Button
-    id: btnChecar
+  UIWidget
+    id: topUI
     anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 20
+    backgroundColor: #00000088
+    Label
+      id: title
+      anchors.fill: parent
+      text-align: center
+      font: verdana-11px-rounded
+      color: #e6bc22
+      text: >> Healing de vocacoes <<
+
+  UIWidget
+    id: uiPanel
+    anchors.top: topUI.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 5
+    height: 82
+
+    BotSwitch
+      id: spellSwitch
+      anchors.top: parent.top
+      anchors.left: parent.left
+      width: 64
+      height: 18
+      !text: tr('Spell')
+
+    BotSwitch
+      id: potSwitch
+      anchors.top: parent.top
+      anchors.left: spellSwitch.right
+      margin-left: 2
+      width: 64
+      height: 18
+      !text: tr('Potion')
+
+    Button
+      id: settings
+      anchors.top: parent.top
+      anchors.left: potSwitch.right
+      anchors.right: parent.right
+      margin-left: 3
+      height: 17
+      text: Setup
+
+    UIWidget
+      id: profileButtons
+      anchors.top: spellSwitch.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 5
+      height: 18
+      layout:
+        type: horizontalBox
+        spacing: 4
+
+      Button
+        id: EK
+        text: EK
+        width: 30
+      Button
+        id: RP
+        text: RP
+        width: 30
+      Button
+        id: ED
+        text: ED
+        width: 30
+      Button
+        id: MS
+        text: MS
+        width: 30
+
+  UIWidget
+    id: setupWindow
+    anchors.top: uiPanel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 210
+    background-color: #1a1a1acc
+    border: 1 black
+    padding: 5
+    margin-top: 3
+
+    ScrollablePanel
+      id: container
+      anchors.fill: parent
+      vertical-scrollbar: scrollBar
+      layout:
+        type: verticalBox
+        spacing: 5
+
+    VerticalScrollBar
+      id: scrollBar
+      anchors.top: parent.top
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      width: 8
+
+  Label
+    id: lblMarcaDaguaBrinque
+    text: >> BRINQUE SCRIPT v3.0 <<
+    font: verdana-11px-rounded
+    anchors.bottom: closeBtn.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 8
+    text-align: center
+
+  -- AJUSTADO: Botão de fechar ocupa a metade esquerda e serve de âncora horizontal
+  Button
+    id: closeBtn
+    text: Fechar
+    anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.horizontalCenter
     margin-right: 2
-    height: 17
-    text: Ver Licenca
-    font: verdana-11px-rounded
+    height: 20
+
+  -- TRAVA SUPREMA: Botão Discord embutido nativamente na string para nunca mais flutuar solto!
   Button
-    id: btnMacrosMenu
-    anchors.top: parent.top
+    id: btnDiscordOficial
+    text: Discord
+    anchors.bottom: parent.bottom
     anchors.left: parent.horizontalCenter
     anchors.right: parent.right
     margin-left: 2
-    height: 17
-    text: Escolher Macros
-    font: verdana-11px-rounded
-  ]], getTab("GUILD"))
+    height: 20
+]], widgetRaizDoJogo)
 
-        uiTravaAba.btnChecar.onClick = function()
-            if setupAvisoWindow:isVisible() then setupAvisoWindow:hide() else setupAvisoWindow:show() setupAvisoWindow:raise() setupAvisoWindow:focus() end
-        end
-        uiTravaAba.btnMacrosMenu.onClick = function()
-            if setupMacrosWindow:isVisible() then setupMacrosWindow:hide() else setupMacrosWindow:show() setupMacrosWindow:raise() setupMacrosWindow:focus() end
-        end
-    else
-        uiTravaAba = setupUI([[
+healerMainWindow:hide()
+
+local topUI = healerMainWindow.topUI
+local ui = healerMainWindow.uiPanel
+local setup = healerMainWindow.setupWindow
+setup:hide()
+
+-- Conecta a função de clique direto no ID interno trancado
+if healerMainWindow.btnDiscordOficial then
+    healerMainWindow.btnDiscordOficial.onClick = function()
+        g_platform.openUrl("https://discord.gg/u6cjGDg3UH")
+    end
+end
+
+local painelDaAbaTools = getTab("hp")
+if painelDaAbaTools:recursiveGetChildById("panelHealerBotoesNativos") then
+    painelDaAbaTools:recursiveGetChildById("panelHealerBotoesNativos"):destroy()
+end
+
+botoesHealerUI = setupUI([[
 Panel
-  height: 20
-  Label
-    id: lblAvisoBloqueio
+  id: panelHealerBotoesNativos
+  height: 17
+  margin-top: 4
+
+  Button
+    id: btnAbrePainelHealer
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
     text-align: center
-    font: verdana-11px-rounded
-  ]], getTab("GUILD"))
-        
-        if uiTravaAba and uiTravaAba.lblAvisoBloqueio then
-            uiTravaAba.lblAvisoBloqueio:setText(tostring(mensagemStatus))
-            uiTravaAba.lblAvisoBloqueio:setColor(corStatus or "#ff4444")
-        end
-        setupMacrosWindow:hide()
-    end
-end
-
--- 💥 INSTALE SEU WEBHOOK COPIADO DO DISCORD AQUI DENTRO
-local URL_WEBHOOK_DISCORD = "https://discord.com/api/webhooks/1536100384785834064/31bfP1tvqS7nx_s99Vzr6NxAFvGcAf2MGdpPbezQ1hocXHc_DgiGaTDxkTpMyC_lU1NL"
-
-local jaEnviouNotificacao = false
-
-local function registrarNovoUsuarioNoDiscord(nickChar, idCapturado, statusLicenca)
-    if jaEnviouNotificacao then return end
-    if not URL_WEBHOOK_DISCORD or URL_WEBHOOK_DISCORD == "" or URL_WEBHOOK_DISCORD:find("COLE_AQUI") then return end
-    
-    jaEnviouNotificacao = true
-    
-    local estruturaPayload = {
-        username = "Brinque Scripts Alerta",
-        embeds = {
-            {
-                title = "🔒 Verificacao de Licenca de Hardware",
-                color = 16711680,
-                fields = {
-                    { name = "👤 Personagem (Nick):", value = nickChar, inline = true },
-                    { name = "🖥️ Codigo da Maquina (HWID):", value = "`" .. idCapturado .. "`", inline = true },
-                    { name = "⚙️ Status do Acesso:", value = statusLicenca, inline = true }
-                },
-                footer = { text = "Controle de Vendas Automatizado - Brinque Scripts" }
-            }
-        }
-    }
-    HTTP.postJSON(URL_WEBHOOK_DISCORD, estruturaPayload, function(res, err) end)
-end
+    height: 17
+    text: Config Healer Ultimate
+]], painelDaAbaTools)
 
 -- =============================================================================
--- [PARTE 5 DE 6] ENGINE DE DATAS E ASSINATURA RIGIDA RAM - BRINQUE SCRIPTS
+-- BANCO DE DADOS E PERFIS (STORAGE ORIGINAL INTEGRADO)
 -- =============================================================================
-local MAPA_MACROS_GUILDA = {
-    -- ==========================================
-    -- MACROS COM PRIORIDADE (HEALING)
-    -- ==========================================
-    { nome = "HEALING BRQ",          key = "healingBRQ",         cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/healingBRQ.lua" },
-    { nome = "OPEN BAG MAIN BRQ",    key = "openbagmainBRQ",     cat = "EXTRAS",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagmainBRQ.lua" },
-    { nome = "BLESSED HP/MP BRQ",    key = "blessedhpmpBRQ",     cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/blessed_hpmpBRQ.lua" },
-    { nome = "ENEGY-SSA-MIGHT BRQ",  key = "energyssamightBRQ",  cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/enegy_ssa_mightBRQ.lua" },
-	{ nome = "Painel",    key = "painel",     cat = "EXTRAS",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Painel.lua" },
-    { nome = "POT GUILD BRQ",        key = "potguildBRQ",        cat = "HEALING",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/potguildBRQ.lua" },
-	{ nome = "STAMINA BRQ",          key = "staminaBRQ",         cat = "HEALING",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/staminaBRQ.lua" },
-	{ nome = "BUFF BRQ",          key = "BUFFBRQ",         cat = "HEALING",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/BRQ_buff_v1.0.lua" },
-	{ nome = "Food BRQ",          key = "Food",         cat = "HEALING",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Food.lua" },
-
-
-    -- ==========================================
-    -- MACROS SEM PRIORIDADE (CAVE/TARGET)
-    -- ==========================================
-    { nome = "FUGA COMPLETA BRQ",    key = "fugacompletaBRQ",    cat = "CAVE/TARGET",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fugacompletaBRQ.lua" },
-    { nome = "OLHEIRO_BRQ",          key = "olheiroBRQ",         cat = "CAVE/TARGET",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/olheiro_BRQ1.0.lua" },
-    { nome = "COMBO LIDER BRQ",      key = "comboliderBRQ",      cat = "CAVE/TARGET", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/comboliderBRQ.lua" },
-    { nome = "OUTFIT VISUAL BRQ",    key = "outfitvisualBRQ",    cat = "EXTRAS", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/outfitvisualBRQ.lua" },
-    { nome = "TARGET PLAY OFF",      key = "targetplayoffBRQ",   cat = "CAVE/TARGET",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/targetplayoffBRQ.lua" },
-    -- ==========================================
-    -- MACROS DA AUTOMATICO GUILDA (WAR)
-    -- ==========================================
-
-	{ nome = "PUSHE BRQ",          key = "pusheBRQ",          cat = "WAR",         url = "https://raw.githubusercontent.com/zedojavascripts/javaserver/refs/heads/main/scripts/sv_ilusion/war/pushmouse-obfuscated.lua" },
-    { nome = "3 PUSHE BRQ",          key = "3pusheBRQ",          cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/3pusheBRQ.lua" },
-	{ nome = "Central de Icones BRQ",          key = "centralicones",          cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/AttackIcons.lua" },
-    { nome = "ANTPUSHE MOUSE-PE BRQ", key = "antpushemousepeBRQ", cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/Dropar_item_na_posicao_do_mouseBRQ.lua" },
-    { nome = "MW NO PE",             key = "MWPE",               cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/mwnopeBRQ.lua" },
-    { nome = "PUXAR AO REDOR BRQ",   key = "puxaraoredorBRQ",    cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/puxaraoredorBRQ.lua" },
-    { nome = "EXIVA BRQ",            key = "exivaBRQ",           cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/exivaBRQ.lua" },
-
-    -- ==========================================
-    -- MACROS EXTRAS (EXTRAS)
-    -- ==========================================
-	{ nome = "FILTRO BATTLE BRQ",    key = "filtrobatleBRQ",     cat = "WAR",     url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/filtrobatleBRQ.lua" },
-	{ nome = "SKILLS BRQ",           key = "skillsBRQ",          cat = "EXTRAS", url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/skillsBRQ.lua" },
-    { nome = "FPS BRQ",              key = "fpsBRQ",             cat = "EXTRAS",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/fpsBRQ.lua" },
-	{ nome = "FOLLOW ATTACK BRQ",              key = "followattackBRQ",             cat = "WAR",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/followattackBRQ.lua" },
-	{ nome = "BUGMAP BRQ",              key = "bugmapBRQ",             cat = "EXTRAS",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/bugmap.lua" },
-    { nome = "RAINBOW COLOR BRQ",    key = "rainbowcolorBRQ",    cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/rainbowcolorBRQ.lua" },
-    { nome = "HUND COLOR BRQ",       key = "hundcolorBRQ",       cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/hundcolorBRQ.lua" },
-    { nome = "OPEN BAG CHEIA BRQ",   key = "openbagcheiaBRQ",    cat = "EXTRAS",       url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/openbagcheiaBRQ.lua" },
-	{ nome = "MAGIAS S/PK BRQ",      key = "magiasempkBRQ",      cat = "EXTRAS",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/magiasempkBRQ.lua" },
-	{ nome = "FORUM BRQ",      key = "forumBRQ",      cat = "EXTRAS",         url = "https://raw.githubusercontent.com/Brinquee/GUILDA_MOST_WANTED/refs/heads/main/scripts/Guilda/forum.lua" }
+storage.healProfiles = storage.healProfiles or {
+current = "EK",
+EK = { h1={on=true,title="High",text="exura ico",min=70,max=90}, h2={on=true,title="Low", text="exura med ico",min=0,max=69} },
+RP = { h1={on=true,title="High",text="exura san",min=60,max=90}, h2={on=true,title="Low", text="exura gran san",min=0,max=59} },
+ED = { h1={on=true,title="High",text="exura",min=80,max=95}, h2={on=true,title="Low", text="exura gran res",min=0,max=79} },
+MS = { h1={on=true,title="High",text="exura",min=70,max=95}, h2={on=true,title="Low", text="exura vita",min=0,max=69} }
 }
 
-local function converterDataParaTimestamp(dataTexto)
-    local dia, mes, ano = dataTexto:match("(%d+)/(%d+)/(%d+)")
-    if dia and mes and ano then return os.time({year = tonumber(ano), month = tonumber(mes), day = tonumber(dia), hour = 23, min = 59, sec = 59}) end
-    return nil
+storage.potProfiles = storage.potProfiles or {
+current = "EK",
+EK = { {on=true,title="HP",item=266,min=0,max=80,type="hp"}, {on=true,title="MP",item=268,min=0,max=100,type="mp"} },
+RP = { {on=true,title="HP",item=266,min=0,max=80,type="hp"}, {on=true,title="MP",item=268,min=0,max=100,type="mp"} },
+ED = { {on=true,title="HP",item=266,min=0,max=100,type="hp"}, {on=true,title="MP",item=268,min=0,max=100,type="mp"} },
+MS = { {on=true,title="HP",item=266,min=0,max=100,type="hp"}, {on=true,title="MP",item=268,min=0,max=100,type="mp"} }
+}
+
+local function refreshSetup()
+  local setup = healerMainWindow.setupWindow
+  if not setup or not setup.container then return end
+  setup.container:destroyChildren()
+  local cur = storage.healProfiles.current
+  local spell = storage.healProfiles[cur]
+  local pot   = storage.potProfiles[cur]
+  if UI.DualScrollPanel then
+    for _,cfg in ipairs({spell.h1, spell.h2}) do
+      UI.DualScrollPanel(cfg,function(widget,new) for k,v in pairs(new) do cfg[k]=v end end,setup.container)
+    end
+  end
+  if UI.DualScrollItemPanel then
+    for _,cfg in ipairs(pot) do
+      UI.DualScrollItemPanel(cfg,function(widget,new) for k,v in pairs(new) do cfg[k]=v end end,setup.container)
+    end
+  end
 end
 
--- EXTRAÇÃO DE MEMÓRIA DO EXECUTÁVEL: ID travado por hardware que ignora OTServers
-local somaModulosFixo = 0
-if dink and type(dink) == "table" then somaModulosFixo = somaModulosFixo + #dink end
-if m_modules and type(m_modules) == "table" then somaModulosFixo = somaModulosFixo + #m_modules end
-
-local sementesMatematica = tostring(g_resources.getLayout()):lower():trim()
-local hashCalculadoLocal = somaModulosFixo * 7
-for i = 1, #sementesMatematica do 
-    hashCalculadoLocal = (hashCalculadoLocal * 31 + string.byte(sementesMatematica, i)) % 100000000 
+local function updateUI()
+  local ui = healerMainWindow.uiPanel
+  if not ui or not ui.spellSwitch or not ui.potSwitch then return end
+  ui.spellSwitch:setOn(spellMacro:isOn())
+  ui.potSwitch:setOn(potMacro:isOn())
+  storage.healing_master  = spellMacro:isOn()
+  storage.potions_enabled = potMacro:isOn()
+  local cur = storage.healProfiles.current
+  for _,id in ipairs({"EK","RP","ED","MS"}) do
+    if ui.profileButtons[id] then ui.profileButtons[id]:setColor(cur == id and "#55ff55" or "white") end
+  end
 end
-hwidDaMaquinaDoCliente = "BRINQUE-GLOBAL-" .. tostring(hashCalculadoLocal)
 
--- 🔒 ACESSO FECHADO SEGURO: Modo livre totalmente desativado para proteção comercial
-local MODO_LIVRE_RASTREADOR = false
+local function setSpell(state)
+  spellMacro:setOn(state)
+  storage.healing_master = state
+  local ui = healerMainWindow.uiPanel
+  if ui and ui.spellSwitch then ui.spellSwitch:setOn(state) end
+end
 
-computadorEstaAutorizado = false
-stringAvisoAba = "PC NAO REGISTRADO"
-corAvisoAba = "#ff4444"
+local function setPot(state)
+  potMacro:setOn(state)
+  storage.potions_enabled = state
+  local ui = healerMainWindow.uiPanel
+  if ui and ui.potSwitch then ui.potSwitch:setOn(state) end
+end
 
--- Validador de chaves e prazos com proteção estrita de interface
-local function processarSegurancaEVerificacaoDeDatas()
-    local dadosDestePC = BANCO_DADOS_CLIENTES[hwidDaMaquinaDoCliente]
-    
-    if dadosDestePC then
-        if setupAvisoWindow and setupAvisoWindow.lblNomeCliente then
-            setupAvisoWindow.lblNomeCliente:setText("Cliente: " .. dadosDestePC.nome)
-        end
-        
-        if dadosDestePC.vence == "ilimitado" then
-            computadorEstaAutorizado = true
-            stringAvisoAba = "ACESSO PERMANENTE"
-            corAvisoAba = "#00bfff"
-            if setupAvisoWindow and setupAvisoWindow.lblDiasRestantes then
-                setupAvisoWindow.lblDiasRestantes:setText("Status do Acesso: Permanente")
-                setupAvisoWindow.lblDiasRestantes:setColor("#00bfff")
-            end
-            print("[BRINQUE SCRIPTS] Administrador verificado! Acesso ilimitado concedido.")
-        else
-            local timestampVencimento = converterDataParaTimestamp(dadosDestePC.vence)
-            if timestampVencimento then
-                local segundosRestantes = timestampVencimento - os.time()
-                local diasRestantes = math.ceil(segundosRestantes / 86400)
-                if diasRestantes > 0 then
-                    computadorEstaAutorizado = true
-                    stringAvisoAba = "PC AUTORIZADO"
-                    corAvisoAba = "#44ff44"
-                    if setupAvisoWindow and setupAvisoWindow.lblDiasRestantes then
-                        setupAvisoWindow.lblDiasRestantes:setText("Dias Restantes: " .. diasRestantes .. " dias")
-                        if diasRestantes <= 7 then
-                            setupAvisoWindow.lblDiasRestantes:setColor("#ff4444")
-                            stringAvisoAba = "RENOVAR EM BREVE"
-                            corAvisoAba = "#ff4444"
-                        else
-                            setupAvisoWindow.lblDiasRestantes:setColor("#44ff44")
-                        end
-                    end
-                    if setupAvisoWindow then setupAvisoWindow:show() end
-                else
-                    stringAvisoAba = "ACESSO EXPIRADO"
-                    if setupAvisoWindow and setupAvisoWindow.lblDiasRestantes then
-                        setupAvisoWindow.lblDiasRestantes:setText("Acesso Expirado! Bloqueado.")
-                        setupAvisoWindow.lblDiasRestantes:setColor("#ff4444")
-                    end
-                    if setupAvisoWindow and setupAvisoWindow.closeBtn then setupAvisoWindow.closeBtn:hide() end
-                    if setupAvisoWindow then setupAvisoWindow:show() end
-                    MAPA_MACROS_GUILDA = {}
-                end
-            end
-        end
+local function setProfile(name)
+  storage.healProfiles.current = name
+  storage.potProfiles.current = name
+  updateUI()
+  local setup = healerMainWindow.setupWindow
+  if setup and setup:isVisible() then refreshSetup() end
+end
+-- =============================================================================
+-- [BLOCO 5] OS MOTORES DOS MACROS DE CURA (EXECUÇÃO ORIGINAL)
+-- =============================================================================
+local function getPlayer()
+  return g_game.getLocalPlayer()
+end
+
+spellMacro = macro(200, function()
+  local player = getPlayer()
+  if not player or not spellMacro:isOn() then return end
+
+  local cfg = storage.healProfiles[storage.healProfiles.current]
+  local hp = player:getHealthPercent()
+
+  for _,heal in ipairs({cfg.h2,cfg.h1}) do
+    if heal.on and hp >= heal.min and hp <= heal.max then
+      say(heal.text)
+      return
+    end
+  end
+end)
+
+potMacro = macro(250, function()
+  local player = getPlayer()
+  if not player or not potMacro:isOn() then return end
+
+  local curProfile = storage.potProfiles.current or "EK"
+  local cfg = storage.potProfiles[curProfile]
+  if not cfg then return end
+
+  for _,pot in ipairs(cfg) do
+    local percent = 0
+
+    if pot.type == "hp" then
+      percent = player:getHealthPercent()
     else
-        if setupBloqueioWindow and setupBloqueioWindow.lblCodigoPC then
-            setupBloqueioWindow.lblCodigoPC:setText("ID DO PC: " .. hwidDaMaquinaDoCliente)
-        end
-        if setupBloqueioWindow then setupBloqueioWindow:show() end
-        MAPA_MACROS_GUILDA = {}
+      percent = math.floor(100 * (player:getMana() / math.max(player:getMaxMana(),1)))
     end
+
+    if pot.on and percent >= pot.min and percent <= pot.max then
+      g_game.useInventoryItemWith(pot.item, player)
+      return
+    end
+  end
+end)
+
+-- =============================================================================
+-- [BLOCO 6] ARREMATES DE EVENTOS DE CLIQUES E VÍNCULOS GRÁFICOS
+-- =============================================================================
+local ui = healerMainWindow.uiPanel
+local setup = healerMainWindow.setupWindow
+local topUI = healerMainWindow.topUI
+
+ui.spellSwitch.onClick = function()
+  setSpell(not spellMacro:isOn())
 end
-local ORDEM_CATEGORIAS = { "HEALING", "CAVE/TARGET", "WAR", "EXTRAS" }
-local CORES_CATEGORIAS = { ["HEALING"] = "#44ff44", ["CAVE/TARGET"] = "#00bfff", ["WAR"] = "#ff4444", ["EXTRAS"] = "#e6bc22" }
 
-for _, nomeCat in ipairs(ORDEM_CATEGORIAS) do
-    local div = g_ui.createWidget("Label", setupMacrosWindow.listaScroll)
-    div:setText("-- " .. nomeCat .. " --")
-    div:setFont("verdana-11px-rounded")
-    div:setColor(CORES_CATEGORIAS[nomeCat])
-    div:setMarginTop(5)
-    div:setMarginBottom(2)
+ui.potSwitch.onClick = function()
+  setPot(not potMacro:isOn())
+end
 
-    for _, item in ipairs(MAPA_MACROS_GUILDA) do
-        if item.cat == nomeCat then
-            if config.macrosMarcados[item.key] == nil then config.macrosMarcados[item.key] = true end
-            local box = g_ui.createWidget("CheckBox", setupMacrosWindow.listaScroll)
-            box:setText(item.nome)
-            box:setFont("verdana-11px-rounded")
-            box:setHeight(16)
-            box:setChecked(config.macrosMarcados[item.key] == true)
-            box.onClick = function(w)
-                local val = not w:isChecked()
-                w:setChecked(val)
-                config.macrosMarcados[item.key] = val
-            end
-        end
-    end
+ui.settings.onClick = function()
+  if setup:isVisible() then
+    setup:hide()
+  else
+    setup:show()
+    refreshSetup()
+  end
+end
+
+ui.profileButtons.EK.onClick = function() setProfile("EK") end
+ui.profileButtons.RP.onClick = function() setProfile("RP") end
+ui.profileButtons.ED.onClick = function() setProfile("ED") end
+ui.profileButtons.MS.onClick = function() setProfile("MS") end
+
+botoesHealerUI.btnAbrePainelHealer.onClick = function()
+  if healerMainWindow:isVisible() then
+    healerMainWindow:hide()
+  else
+    healerMainWindow:show()
+    healerMainWindow:raise()
+    healerMainWindow:focus()
+    updateUI()
+  end
+end
+
+healerMainWindow.closeBtn.onClick = function()
+  healerMainWindow:hide()
 end
 
 -- =============================================================================
--- [PARTE 6 DE 6] FILA ULTRA RÁPIDA (200MS) E ARRANCADA DO COMPILADOR
+-- ICONS (MÉTODO DO SEU MODELO ORIGINAL COM ARRASTE LIVRE)
 -- =============================================================================
-local loteJaEstaSendoBaixado = false
-local function executarFilaCustomizadaHTTP(indice)
-    if not computadorEstaAutorizado then return end
-    if indice == 1 then if loteJaEstaSendoBaixado then return end loteJaEstaSendoBaixado = true end
-    
-    local macroAlvo = MAPA_MACROS_GUILDA[indice]
-    if not macroAlvo then 
-        print("[Brinque Scripts] Todos os macros ativos injetados via nuvem com sucesso.")
-        loteJaEstaSendoBaixado = false 
-        return 
-    end
-    
-    if config.macrosMarcados[macroAlvo.key] == true then
-        HTTP.get(macroAlvo.url .. "?v=" .. os.time(), function(content, err)
-            if not err then
-                if macroAlvo.url:find("PotGuild.lua") then 
-                    if partyPotUI then partyPotUI:destroy() partyPotUI = nil end 
-                    if ppWindow then ppWindow:destroy() ppWindow = nil end 
-                end
-                local script, syntaxErr = loadstring(content)
-                if script then pcall(script) else print("[Erro Script] Slot falhou: " .. tostring(syntaxErr)) end
-            end
-            -- VELOCIDADE PERFORMANCE: Carrega a fila em escada a cada 200 milissegundos
-            schedule(10, function() executarFilaCustomizadaHTTP(indice + 1) end)
-        end)
-    else
-        schedule(10, function() executarFilaCustomizadaHTTP(indice + 1) end)
+local spellIcon = addIcon("spellIcon",{text="SPELL",item=23528},spellMacro)
+spellIcon:breakAnchors()
+spellIcon:setDraggable(true)
+if storage.iconSpellPos then
+  spellIcon:move(storage.iconSpellPos.x, storage.iconSpellPos.y)
+end
+
+local potIcon = addIcon("potIcon",{text="POT",item=23526},potMacro)
+potIcon:breakAnchors()
+potIcon:setDraggable(true)
+if storage.iconPotPos then
+  potIcon:move(storage.iconPotPos.x, storage.iconPotPos.y)
+end
+
+-- =============================================================================
+-- WATCHER CRONOMETRADO (GRAVAÇÃO DE POSIÇÕES + SUA MARCA PULSANTE)
+-- =============================================================================
+macro(100, function()
+  updateUI()
+
+  if spellIcon then
+    local pos = spellIcon:getPosition()
+    storage.iconSpellPos = {x = pos.x, y = pos.y}
+  end
+
+  if potIcon then
+    local pos = potIcon:getPosition()
+    storage.iconPotPos = {x = pos.x, y = pos.y}
+  end
+
+  -- Mantém a pulsação matemática suave em seno na sua assinatura no rodapé
+  if healerMainWindow and healerMainWindow:isVisible() and healerMainWindow.lblMarcaDaguaBrinque then
+    local equacaoSeno = math.abs(math.sin(os.clock() * 4))
+    local tomDeCinza = math.floor(100 + (155 * equacaoSeno))
+    healerMainWindow.lblMarcaDaguaBrinque:setColor(string.format("#%02X%02X%02X", tomDeCinza, tomDeCinza, tomDeCinza))
+  end
+end)
+
+setSpell(storage.healing_master)
+setPot(storage.potions_enabled)
+updateUI()
+
+UI.Separator()
+
+
+
+-- =============================================================================
+-- [BRINQUE SCRIPTS] MACRO DE AVISO OBRIGATÓRIO DE MIGRAÇÃO V2.0 - PARTE 1 DE 2
+-- =============================================================================
+
+local widgetRaizDoJogo = g_ui.getRootWidget()
+local painelAvisoVelho = widgetRaizDoJogo:recursiveGetChildById("janelaAvisoMigracaoV2")
+if painelAvisoVelho then painelAvisoVelho:destroy() end
+
+local LINK_SUPORTE_WHATSAPP = "https://chat.whatsapp.com/D4WHVuAy41t6uQ6QZ3ibtR"
+
+-- 🛠️ CORREÇÃO SUPREMA: Âncoras separadas linha por linha e removido os comentários internos
+local designAvisoOTUI = "UIWindow\n" ..
+"  id: janelaAvisoMigracaoV2\n" ..
+"  size: 1000 300\n" ..
+"  anchors.horizontalCenter: parent.horizontalCenter\n" ..
+"  anchors.verticalCenter: parent.verticalCenter\n" ..
+"  clipping: true\n" ..
+"  padding: 15\n" ..
+"  layout: anchor\n" ..
+"\n" ..
+"  Panel\n" ..
+"    background-color: #000000D5\n" ..
+"    anchors.fill: parent\n" ..
+"    margin: 0\n" ..
+"    phantom: true\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblTituloAviso\n" ..
+"    text: !!! ALERTA DE ATUALIZACAO EM 1 MINUTO O PAINEL SAI!!!\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ff4444\n" ..
+"    anchors.top: parent.top\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 10\n" ..
+"    text-align: center\n" ..
+"\n" ..
+"  Label\n" ..
+"    id: lblCorpoAviso\n" ..
+"    text: Comunicamos Que Esta versao 2.0 sera DESATIVADA. Por favor, entre em contato com a administracao Pelo link Não fique sem as Suas scripts!\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    color: #ffffff\n" ..
+"    anchors.top: lblTituloAviso.bottom\n" ..
+"    anchors.left: parent.left\n" ..
+"    anchors.right: parent.right\n" ..
+"    margin-top: 15\n" ..
+"    text-align: center\n" ..
+"\n" ..
+"  Button\n" ..
+"    id: btnFalarSuporte\n" ..
+"    text: FALAR COM A ADMINISTRACAO\n" ..
+"    color: #00ff00\n" ..
+"    font: verdana-11px-rounded\n" ..
+"    image-source: /bot/BRINQUE/imagens/BOTAO.png\n" ..
+"    image-smooth: true\n" ..
+"    image-border: 5\n" ..
+"    anchors.bottom: parent.bottom\n" ..
+"    anchors.horizontalCenter: parent.horizontalCenter\n" ..
+"    margin-bottom: 10\n" ..
+"    size: 260 26\n"
+
+janelaAvisoMestre = setupUI(designAvisoOTUI, widgetRaizDoJogo)
+janelaAvisoMestre:show()
+janelaAvisoMestre:raise()
+janelaAvisoMestre:focus()
+-- =============================================================================
+-- [BRINQUE SCRIPTS] MACRO DE AVISO OBRIGATÓRIO DE MIGRAÇÃO V2.0 - PARTE 2 DE 2
+-- =============================================================================
+
+-- Vincula a ação de clique para abrir o WhatsApp de suporte do administrador
+janelaAvisoMestre.btnFalarSuporte.onClick = function()
+    if g_signals and g_signals.openUrl then 
+        g_signals.openUrl(LINK_SUPORTE_WHATSAPP)
+    elseif g_platform and g_platform.openUrl then 
+        g_platform.openUrl(LINK_SUPORTE_WHATSAPP)
+    else 
+        print(">>> [BRINQUE] Acesse o suporte pelo link: " .. LINK_SUPORTE_WHATSAPP) 
     end
 end
 
-macro(600000, function() 
-    if processarSegurancaEVerificacaoDeDatas then processarSegurancaEVerificacaoDeDatas() end
-    renderizarBotaoMenuLateral(computadorEstaAutorizado, stringAvisoAba, corAvisoAba)
-    if not computadorEstaAutorizado then reload() end 
-end)
-
-onTextMessage(function(m, t)
-    if m ~= 20 then return end
-    local d = t:match("is to the ([a-z-]+)%.") or t:match("is .- to the ([a-z-]+)%.")
-    if d then showExivaArrow(d) end
-end)
-
--- TIMEOUT DE ARRANCADA SEGURO: Roda estritamente após todas as estruturas estarem na RAM
-schedule(1000, function()
-    -- 1. Processa a segurança, injeta as strings e analisa o calendário
-    if processarSegurancaEVerificacaoDeDatas then processarSegurancaEVerificacaoDeDatas() end
-    
-    -- 2. Renderiza o botão lateral correspondente na aba lateral do vBot
-    renderizarBotaoMenuLateral(computadorEstaAutorizado, stringAvisoAba, corAvisoAba)
-    
-    local localPlayer = g_game.getLocalPlayer()
-    local nomeVerdadeiroDoChar = localPlayer and localPlayer:getName() or "Desconhecido"
-    
-    -- 3. Dispara a notificação sem duplicações (Lê a trava da Parte 4) para o seu Discord
-    if BANCO_DADOS_CLIENTES[hwidDaMaquinaDoCliente] then
-        local dadosLicenca = BANCO_DADOS_CLIENTES[hwidDaMaquinaDoCliente]
-        registrarNovoUsuarioNoDiscord(nomeVerdadeiroDoChar, hwidDaMaquinaDoCliente, "Acesso Permitido para: " .. dadosLicenca.nome)
-    else
-        registrarNovoUsuarioNoDiscord(nomeVerdadeiroDoChar, hwidDaMaquinaDoCliente, "Acesso Negado (Bloqueado em Tela)")
-    end
-
-    -- 4. Inicia as injeções em nuvem se o computador constar nos autorizados da Parte 1
-    if computadorEstaAutorizado then
-        print("[Brinque Scripts] Identidade confirmada. Carregando macros via nuvem em alta performance...")
-        executarFilaCustomizadaHTTP(1)
-    else
-        print(">>> [BRINQUE SCRIPTS] Bloqueado. Maquina invalida ou licenca vencida.")
+-- 🧠 TEMPORIZADOR DE MIGRACAO: Conta exatamente 1 minuto (60000ms) e fecha o painel
+schedule(60000, function()
+    -- Procura o modal ativo diretamente pelo ID na raiz gráfica para evitar vazamentos de memória
+    local widgetAlvoParaFechar = g_ui.getRootWidget():recursiveGetChildById("janelaAvisoMigracaoV2")
+    if widgetAlvoParaFechar then
+        widgetAlvoParaFechar:destroy()
+        print("[Brinque] O painel de aviso foi fechado automaticamente apos 1 minuto.")
     end
 end)
