@@ -479,7 +479,7 @@ local designAvisoOTUI = "UIWindow\n" ..
 "\n" ..
 "  Label\n" ..
 "    id: lblCorpoAviso\n" ..
-"    text: Comunicamos Que Esta versao 2.0 sera DESATIVADA. Por favor, entre em contato com a administracao Pelo link Não fique sem as Suas scripts!\n" ..
+"    text: Comunicamos Esta Custom da versao 2.0 esta DESATIVADA. Por favor, entre em contato com a administracao Pelo link Não fique sem as Suas scripts!\n" ..
 "    font: verdana-11px-rounded\n" ..
 "    color: #ffffff\n" ..
 "    anchors.top: lblTituloAviso.bottom\n" ..
